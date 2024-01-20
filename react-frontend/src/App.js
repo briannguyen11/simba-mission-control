@@ -6,6 +6,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 
 import ArrowKeys from "./components/ArrowKeys";
 import RoutePlanner from "./components/RoutePlanner";
+import MapContainer from "./components/Map";
 
 function App() {
   const Item = styled(Paper)(({ theme }) => ({
@@ -44,7 +45,7 @@ function App() {
             <Grid item xs={12}>
               <Paper>
                 {/* Content for xs=8 */}
-                <Item>google maps</Item>
+                <MapContainer />
               </Paper>
             </Grid>
             {/* Route Input */}
