@@ -6,7 +6,7 @@ import RightArrowIcon from "../icons/RightArrowIcon.js";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
 import Grid from "@mui/material/Unstable_Grid2";
 
-function ArrowKeys() {
+function ArrowKeys({ onDirectionChange }) {
   const [highlightedKey, setHighlightedKey] = useState(null);
 
   useEffect(() => {
@@ -17,6 +17,9 @@ function ArrowKeys() {
         case "ArrowLeft":
         case "ArrowRight":
           setHighlightedKey(event.key);
+          onDirectionChange(event.key);
+
+          console.log("Pressed direction:", event.key);
           break;
         default:
           break;
@@ -34,7 +37,7 @@ function ArrowKeys() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [onDirectionChange]);
 
   return (
     <Box

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -7,6 +7,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import ArrowKeys from "./components/ArrowKeys";
 import RoutePlanner from "./components/RoutePlanner";
 import MapContainer from "./components/Map";
+import LogContainer from "./components/Log";
 
 function App() {
   const Item = styled(Paper)(({ theme }) => ({
@@ -16,6 +17,11 @@ function App() {
     textAlign: "center",
     color: theme.palette.text.secondary,
   }));
+
+  const [directionLog, setDirectionLog] = useState("");
+  const handleDirectionChange = (direction) => {
+    setDirectionLog(direction);
+  };
 
   return (
     <div
@@ -34,19 +40,13 @@ function App() {
 
           {/* Log Column */}
           <Grid item xs={4}>
-            <Paper>
-              {/* Content for xs=4 */}
-              <Item>xs=4</Item>
-            </Paper>
+            <LogContainer direction={directionLog} />
           </Grid>
 
           <Grid container xs={8} spacing={2}>
             {/* Google Maps */}
             <Grid item xs={12}>
-              <Paper>
-                {/* Content for xs=8 */}
-                <MapContainer />
-              </Paper>
+              <MapContainer />
             </Grid>
             {/* Route Input */}
             <Grid item xs={8}>
@@ -55,7 +55,7 @@ function App() {
 
             {/* Manual Controls */}
             <Grid item xs={4}>
-              <ArrowKeys />
+              <ArrowKeys onDirectionChange={handleDirectionChange} />
             </Grid>
           </Grid>
         </Grid>

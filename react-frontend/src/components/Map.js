@@ -1,9 +1,9 @@
 import React from "react";
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 function MapContainer() {
   const mapStyles = {
-    height: "100vh",
+    height: "50vh",
     width: "100%",
   };
 
@@ -12,13 +12,19 @@ function MapContainer() {
     lng: -120.680656,
   };
 
+  const redMarkerIcon = {
+    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+    scaledSize: { width: 30, height: 30 },
+  };
+
+  require("dotenv").config();
+  const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
   return (
-    <LoadScript googleMapsApiKey="AIzaSyBZ5fLby5ja0TPkDe95jGOyKkIOHLLhweA">
-      <GoogleMap
-        mapContainerStyle={mapStyles}
-        zoom={8}
-        center={defaultCenter}
-      />
+    <LoadScript googleMapsApiKey={googleMapsApiKey}>
+      <GoogleMap mapContainerStyle={mapStyles} zoom={15} center={defaultCenter}>
+        <Marker position={defaultCenter} icon={redMarkerIcon} />
+      </GoogleMap>
     </LoadScript>
   );
 }
