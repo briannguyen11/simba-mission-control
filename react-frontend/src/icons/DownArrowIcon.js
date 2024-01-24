@@ -17,7 +17,7 @@ const DownArrowIcon = ({ size = 24 }) => (
       style={{
         fill: "none",
         stroke: "rgb(255, 255, 255)",
-        strokeWidth: 1.5,
+        strokeWidth: 1,
       }}
     ></path>
     <path

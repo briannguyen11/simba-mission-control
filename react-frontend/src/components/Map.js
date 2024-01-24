@@ -1,10 +1,12 @@
 import React from "react";
+// import dotenv from "dotenv";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 function MapContainer() {
   const mapStyles = {
-    height: "50vh",
+    height: "100%",
     width: "100%",
+    borderRadius: "5px",
   };
 
   const defaultCenter = {
@@ -17,7 +19,7 @@ function MapContainer() {
     scaledSize: { width: 30, height: 30 },
   };
 
-  require("dotenv").config();
+  // dotenv.config();
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   return (

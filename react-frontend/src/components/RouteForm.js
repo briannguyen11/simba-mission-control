@@ -33,7 +33,22 @@ function RouteForm(props) {
             variant="outlined"
             value={location.latitude}
             onChange={handleChange}
-            style={{ color: "white", borderColor: "white" }}
+            InputLabelProps={{
+              style: {
+                color: "white",
+              },
+            }}
+            InputProps={{
+              sx: {
+                color: "white",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "white",
+                },
+                "& input": {
+                  color: "white",
+                },
+              },
+            }}
           />
         </Grid>
         <Grid item>
@@ -44,8 +59,21 @@ function RouteForm(props) {
             variant="outlined"
             value={location.longitude}
             onChange={handleChange}
+            InputLabelProps={{
+              style: {
+                color: "white", // Set label text color to white
+              },
+            }}
             InputProps={{
-              style: { color: "white", borderColor: "white" },
+              sx: {
+                color: "white",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "white",
+                },
+                "& input": {
+                  color: "white",
+                },
+              },
             }}
           />
         </Grid>

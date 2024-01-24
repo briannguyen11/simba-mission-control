@@ -11,10 +11,10 @@ import ClearIcon from "@mui/icons-material/Clear";
 function RouteTable(props) {
   return (
     <>
-      <h3> Planned Route </h3>
+      <h3 style={{ color: "white" }}>Planned Route</h3>
       <TableContainer
         style={{
-          border: "1px solid black",
+          border: "1px solid white",
           maxHeight: "400px",
           overflowY: "auto",
         }}
@@ -22,10 +22,18 @@ function RouteTable(props) {
         <Table size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: "bold" }}>Route Number</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Latitude</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Longitude</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Clear</TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Route Number
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Latitude
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Longitude
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Clear
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -34,11 +42,19 @@ function RouteTable(props) {
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell component="th" scope="row">
-                  {index + 1} {/* Adding 1 to make it 1-based index */}
+                <TableCell
+                  component="th"
+                  scope="row"
+                  style={{ color: "white" }}
+                >
+                  {index + 1}
                 </TableCell>
-                <TableCell>{route.latitude}</TableCell>
-                <TableCell>{route.longitude}</TableCell>
+                <TableCell style={{ color: "white" }}>
+                  {route.latitude}
+                </TableCell>
+                <TableCell style={{ color: "white" }}>
+                  {route.longitude}
+                </TableCell>
                 <TableCell>
                   <IconButton
                     onClick={() => props.onDelete(index)}

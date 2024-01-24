@@ -14,7 +14,7 @@ const RightArrowIcon = ({ size = 24 }) => (
     <path
       id="secondary"
       d="M20,3H4A1,1,0,0,0,3,4V20a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V4A1,1,0,0,0,20,3Zm-3.38,9.69L13.5,14.83a1,1,0,0,1-1.5-.69V9.86a1,1,0,0,1,1.5-.69l3.12,2.14A.82.82,0,0,1,16.62,12.69Z"
-      style={{ fill: "none", stroke: "rgb(255, 255, 255)", strokeWidth: 1.5 }}
+      style={{ fill: "none", stroke: "rgb(255, 255, 255)", strokeWidth: 1 }}
     ></path>
     <path
       id="primary"

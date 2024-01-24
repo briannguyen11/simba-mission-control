@@ -30,8 +30,10 @@ function RoutePlanner() {
       flexDirection="column"
       alignItems="center"
       sx={{
-        backgroundColor: "#4a4e52",
-        borderRadius: "10px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        padding: "10px",
+        color: "white",
       }}
     >
       <Grid

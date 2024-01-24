@@ -1,50 +1,48 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 
-function LogContainer({ direction }) {
-  const [logs, setLogs] = useState([]);
+const formatTime = (time) => {
+  const logTime = new Date(time);
+  const hours = logTime.getHours();
+  const minutes = logTime.getMinutes();
+  const seconds = logTime.getSeconds();
 
-  const getCurrentTime = () => {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const seconds = now.getSeconds().toString().padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  };
+  // Format the time
+  const formattedTime = `${hours}:${minutes}:${seconds}`;
 
-  const updateDirectionChange = useCallback((dir) => {
-    const currentTime = getCurrentTime();
-    const logEntry = `${currentTime} - ${dir}`;
+  return formattedTime;
+};
 
-    // Update the logs state
-    setLogs((prevLogs) => [...prevLogs, logEntry]);
-  }, []);
-
-  useEffect(() => {
-    // Call updateDirectionChange when the direction prop changes
-    updateDirectionChange(direction);
-  }, [direction, updateDirectionChange]);
-
+function LogContainer({ logData }) {
   return (
-    <Box
-      sx={{
-        maxHeight: "900px",
-        overflowY: "auto",
-        border: "1px solid #ccc",
+    <div
+      style={{
+        height: "100%",
+        border: "1px solid white",
         borderRadius: "5px",
-        padding: "10px",
-        marginTop: "10px",
-        color: "white",
+        overflow: "auto",
       }}
     >
-      <Typography variant="h6">Direction Log:</Typography>
-      {logs.map((log, index) => (
-        <Typography key={index} variant="body1" color="white">
-          {log}
-        </Typography>
-      ))}
-    </Box>
+      <div
+        style={{
+          flex: 1,
+          color: "white",
+          padding: "10px",
+        }}
+      >
+        <Typography variant="h6">Direction Log:</Typography>
+        {logData
+          .slice()
+          .reverse()
+          .map((logEntry, index) => (
+            <div key={index}>
+              <Typography variant="body2" color="white">
+                {formatTime(logEntry.time)} - {logEntry.data}
+              </Typography>
+            </div>
+          ))}
+      </div>
+    </div>
   );
 }
 

@@ -14,7 +14,7 @@ const UpArrowIcon = ({ size = 24 }) => (
     <path
       id="secondary"
       d="M20,3H4A1,1,0,0,0,3,4V20a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V4A1,1,0,0,0,20,3Zm-5.86,9H9.86a1,1,0,0,1-.69-1.5l2.14-3.12a.82.82,0,0,1,1.38,0l2.14,3.12A1,1,0,0,1,14.14,12Z"
-      style={{ fill: "none", stroke: "rgb(255, 255, 255)", strokeWidth: 1.5 }}
+      style={{ fill: "none", stroke: "rgb(255, 255, 255)", strokeWidth: 1 }}
     ></path>
     <path
       id="primary"
