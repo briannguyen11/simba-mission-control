@@ -26,7 +26,11 @@ function ArrowKeys({ updateLog }) {
       }
 
       setHighlightedKey(direction);
-      updateLog(direction);
+
+      // update log when arrow keys passed, not any key press
+      if (direction != null) {
+        updateLog(direction);
+      }
 
       try {
         const response = await axios.post("/api/arrow-keys", {

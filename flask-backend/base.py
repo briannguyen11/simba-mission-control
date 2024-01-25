@@ -24,7 +24,5 @@ def handle_arrow_keys():
     return jsonify({"message": f"Received arrow key: {direction}"})
 
 
-
-
 if __name__ == '__main__':
     api.run(port=8000, debug=True)

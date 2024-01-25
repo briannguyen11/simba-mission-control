@@ -1,32 +1,43 @@
 import React, { useState } from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 
 import Header from "./components/Header";
 import LogContainer from "./components/Log";
 import MapContainer from "./components/Map";
 import ArrowKeys from "./components/ArrowKeys";
-// import ArrowKeys from "./components/ArrowKeys";
-// import RoutePlanner from "./components/RoutePlanner";
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
+import RouteForm from "./components/RouteForm";
+import RouteTable from "./components/RouteTable";
 
 function App() {
   const [log, setLog] = useState([]);
+  const [routeData, setRouteData] = useState([]);
 
+  // Log output
   const updateLog = (input) => {
     const currentTime = new Date().getTime();
     const newLog = [...log, { time: currentTime, data: input }];
     setLog(newLog);
     console.log(log);
+  };
+
+  // Route form submission
+  const handleSubmit = (location) => {
+    const newRoute = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    };
+
+    setRouteData((prevData) => [...prevData, newRoute]);
+  };
+
+  // Route table delete
+  const handleDelete = (index) => {
+    setRouteData((prevData) => {
+      const newData = [...prevData];
+      newData.splice(index, 1);
+      return newData;
+    });
   };
 
   return (
@@ -37,22 +48,22 @@ function App() {
       }}
     >
       <Grid container spacing={2}>
-        <Grid xs={12} style={{ height: "7vh", backgroundColor: "red" }}>
+        <Grid xs={12} style={{ height: "7vh" }}>
           <Header />
         </Grid>
-        <Grid xs={4} style={{ height: "60vh", backgroundColor: "green" }}>
+        <Grid xs={4} style={{ height: "60vh" }}>
           <LogContainer logData={log} />
         </Grid>
         <Grid xs={8} style={{ height: "60vh" }}>
           <MapContainer />
         </Grid>
         <Grid xs={4}>
-          <Item>xs=4</Item>
+          <RouteForm handleSubmit={handleSubmit} />
         </Grid>
         <Grid xs={4}>
-          <Item>xs=4</Item>
+          <RouteTable routeData={routeData} onDelete={handleDelete} />
         </Grid>
-        <Grid xs={4} style={{ height: "30vh", backgroundColor: "blue" }}>
+        <Grid xs={4} style={{ height: "30vh" }}>
           <ArrowKeys updateLog={updateLog} />
         </Grid>
       </Grid>

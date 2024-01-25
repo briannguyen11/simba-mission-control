@@ -30,7 +30,9 @@ function LogContainer({ logData }) {
           padding: "10px",
         }}
       >
-        <Typography variant="h6">Direction Log:</Typography>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+          Direction Log
+        </Typography>
         {logData
           .slice()
           .reverse()
