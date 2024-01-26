@@ -23,6 +23,18 @@ def handle_arrow_keys():
 
     return jsonify({"message": f"Received arrow key: {direction}"})
 
+@api.route('/api/route-plan', methods=['POST'])
+def handle_route_plan():
+    try:
+        data = request.get_json()
+        print(f"List of routes: {data}")
+
+        # Perform additional logic based on the received route data
+
+        return jsonify({"message": "Received route data"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400  
+
 
 if __name__ == '__main__':
     api.run(port=8000, debug=True)

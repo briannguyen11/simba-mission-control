@@ -9,7 +9,26 @@ import Grid from "@mui/material/Unstable_Grid2";
 
 function ArrowKeys({ updateLog }) {
   const [highlightedKey, setHighlightedKey] = useState(null);
+  const [arrowSize, setArrowSize] = useState(24);
 
+  // Make size of arrows dynamic
+  useEffect(() => {
+    const handleResize = () => {
+      const newSize = Math.max(24, Math.min(window.innerWidth / 15, 100));
+      setArrowSize(newSize);
+    };
+
+    // call the handleResize function initially and on window resize
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    // cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Hanlde pressing keys down
   useEffect(() => {
     const handleKeyDown = async (event) => {
       let direction = null;
@@ -36,7 +55,9 @@ function ArrowKeys({ updateLog }) {
         const response = await axios.post("/api/arrow-keys", {
           direction,
         });
-        console.log(response.data);
+        if (direction != null) {
+          console.log(response.data);
+        }
       } catch (error) {
         console.error("Error making request:", error);
       }
@@ -77,10 +98,10 @@ function ArrowKeys({ updateLog }) {
             <div
               style={{
                 background:
-                  highlightedKey === "ArrowUp" ? "#f5b301" : "transparent",
+                  highlightedKey === "ArrowUp" ? "#0083ce" : "transparent",
               }}
             >
-              <UpArrowIcon size={100} />
+              <UpArrowIcon size={arrowSize} />
             </div>
           </Grid>
         </Grid>
@@ -89,30 +110,30 @@ function ArrowKeys({ updateLog }) {
             <div
               style={{
                 background:
-                  highlightedKey === "ArrowLeft" ? "#f5b301" : "transparent",
+                  highlightedKey === "ArrowLeft" ? "#0083ce" : "transparent",
               }}
             >
-              <LeftArrowIcon size={100} />
+              <LeftArrowIcon size={arrowSize} />
             </div>
           </Grid>
           <Grid item>
             <div
               style={{
                 background:
-                  highlightedKey === "ArrowDown" ? "#f5b301" : "transparent",
+                  highlightedKey === "ArrowDown" ? "#0083ce" : "transparent",
               }}
             >
-              <DownArrowIcon size={100} />
+              <DownArrowIcon size={arrowSize} />
             </div>
           </Grid>
           <Grid item>
             <div
               style={{
                 background:
-                  highlightedKey === "ArrowRight" ? "#f5b301" : "transparent",
+                  highlightedKey === "ArrowRight" ? "#0083ce" : "transparent",
               }}
             >
-              <RightArrowIcon size={100} />
+              <RightArrowIcon size={arrowSize} />
             </div>
           </Grid>
         </Grid>

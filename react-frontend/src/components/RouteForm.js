@@ -101,7 +101,7 @@ function RouteForm(props) {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" onClick={submitForm}>
+            <Button variant="contained" onClick={submitForm} fullWidth>
               Submit
             </Button>
           </Grid>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
 
@@ -18,17 +19,22 @@ function App() {
     const currentTime = new Date().getTime();
     const newLog = [...log, { time: currentTime, data: input }];
     setLog(newLog);
-    console.log(log);
   };
 
-  // Route form submission
+  // Route form submission (validates coordinate input)
+  const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
   const handleSubmit = (location) => {
     const newRoute = {
       latitude: location.latitude,
       longitude: location.longitude,
     };
-
-    setRouteData((prevData) => [...prevData, newRoute]);
+    if (isNumber(location.latitude) && isNumber(location.longitude)) {
+      setRouteData((prevData) => [...prevData, newRoute]);
+    } else {
+      window.alert(
+        "Invalid input. Latitude and longitude must be valid numbers."
+      );
+    }
   };
 
   // Route table delete
@@ -40,6 +46,18 @@ function App() {
     });
   };
 
+  // Send route data to backend
+  const sendRoutePlan = async () => {
+    console.log("run pressed");
+    try {
+      const response = await axios.post("/api/route-plan", routeData);
+      window.alert("Sent planned route.");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error sending route plan to backend:", error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -49,7 +67,7 @@ function App() {
     >
       <Grid container spacing={2}>
         <Grid xs={12} style={{ height: "7vh" }}>
-          <Header />
+          <Header onSendRoutePlan={sendRoutePlan} />
         </Grid>
         <Grid xs={4} style={{ height: "60vh" }}>
           <LogContainer logData={log} />
@@ -60,10 +78,10 @@ function App() {
         <Grid xs={4}>
           <RouteForm handleSubmit={handleSubmit} />
         </Grid>
-        <Grid xs={4}>
+        <Grid xs={5}>
           <RouteTable routeData={routeData} onDelete={handleDelete} />
         </Grid>
-        <Grid xs={4} style={{ height: "30vh" }}>
+        <Grid xs={3} style={{ height: "30vh" }}>
           <ArrowKeys updateLog={updateLog} />
         </Grid>
       </Grid>
