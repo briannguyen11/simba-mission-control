@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Unstable_Grid2";
 
-function RouteForm(props) {
+function RouteForm({ handleSubmit }) {
   const [location, setLocation] = useState({
     latitude: "",
     longitude: "",
@@ -16,7 +16,7 @@ function RouteForm(props) {
   }
 
   function submitForm() {
-    props.handleSubmit(location);
+    handleSubmit(location);
     setLocation({ latitude: "", longitude: "" });
   }
 

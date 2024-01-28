@@ -14,8 +14,14 @@ function ArrowKeys({ updateLog }) {
   // Make size of arrows dynamic
   useEffect(() => {
     const handleResize = () => {
-      const newSize = Math.max(24, Math.min(window.innerWidth / 15, 100));
-      setArrowSize(newSize);
+      const widthSize = Math.max(24, Math.min(window.innerWidth / 15, 100));
+      const heightSize = Math.max(24, Math.min(window.innerHeight / 10, 100));
+
+      if (heightSize < widthSize) {
+        setArrowSize(heightSize);
+      } else {
+        setArrowSize(widthSize);
+      }
     };
 
     // call the handleResize function initially and on window resize

@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 
-function MapContainer() {
+function MapContainer({ handleClick }) {
+  const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
   const mapStyles = {
     height: "100%",
     width: "100%",
     borderRadius: "5px",
   };
-
-  const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey,
@@ -16,6 +16,7 @@ function MapContainer() {
     scriptLoading: "async", // Load the script asynchronously
   });
 
+  // Re-renders map if need to re-mount to DOM
   useEffect(() => {
     const defaultCenter = {
       lat: 35.305,
@@ -33,13 +34,27 @@ function MapContainer() {
         zoom: 15,
       });
 
-      new window.google.maps.Marker({
+      const marker = new window.google.maps.Marker({
         position: defaultCenter,
         map,
         icon: redMarkerIcon,
       });
+
+      // Gets coordinates of right click pointer
+      window.google.maps.event.addListener(map, "rightclick", (event) => {
+        const clickedLatLng = {
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng(),
+        };
+
+        // Update marker position
+        marker.setPosition(clickedLatLng);
+
+        // Add to route table
+        handleClick(clickedLatLng);
+      });
     }
-  }, [isLoaded]);
+  }, [isLoaded, handleClick]);
 
   if (loadError) return "Error loading Google Maps";
   if (!isLoaded) return "Loading...";

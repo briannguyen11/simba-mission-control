@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -24,18 +24,30 @@ function App() {
   // Route form submission (validates coordinate input)
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
   const handleSubmit = (location) => {
-    const newRoute = {
+    const newDest = {
       latitude: location.latitude,
       longitude: location.longitude,
     };
     if (isNumber(location.latitude) && isNumber(location.longitude)) {
-      setRouteData((prevData) => [...prevData, newRoute]);
+      setRouteData((prevData) => [...prevData, newDest]);
     } else {
       window.alert(
         "Invalid input. Latitude and longitude must be valid numbers."
       );
     }
   };
+
+  // Map click-on location input
+  const handleClick = useCallback(
+    (location) => {
+      const newDest = {
+        latitude: location.lat,
+        longitude: location.lng,
+      };
+      setRouteData((prevData) => [...prevData, newDest]);
+    },
+    [setRouteData]
+  );
 
   // Route table delete
   const handleDelete = (index) => {
@@ -73,7 +85,7 @@ function App() {
           <LogContainer logData={log} />
         </Grid>
         <Grid xs={8} style={{ height: "60vh" }}>
-          <MapContainer />
+          <MapContainer handleClick={handleClick} />
         </Grid>
         <Grid xs={4}>
           <RouteForm handleSubmit={handleSubmit} />

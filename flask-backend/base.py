@@ -13,7 +13,7 @@ def debug():
     return response_body
 
 
-@api.route('/api/arrow-keys', methods=['POST'])
+@api.route('/api/arrow-keys', methods=["POST"])
 def handle_arrow_keys():
     data = request.get_json()
     direction = data.get('direction', '')
@@ -23,17 +23,22 @@ def handle_arrow_keys():
 
     return jsonify({"message": f"Received arrow key: {direction}"})
 
-@api.route('/api/route-plan', methods=['POST'])
+@api.route('/api/route-plan', methods=["GET", "POST"])
 def handle_route_plan():
-    try:
-        data = request.get_json()
-        print(f"List of routes: {data}")
+    route_data = []
+    if request.method == "POST":
+        try:
+            route_data = request.get_json()
+            print(f"List of routes: {route_data}")
 
-        # Perform additional logic based on the received route data
+            # Perform additional logic based on the received route data
 
-        return jsonify({"message": "Received route data"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400  
+            return jsonify({"message": "Received route data"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400  
+    else:
+        # GET requests
+        return jsonify({"route_data": route_data })
 
 
 if __name__ == '__main__':
