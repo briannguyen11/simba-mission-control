@@ -13,6 +13,7 @@ import RouteTable from "./components/RouteTable";
 function App() {
   const [log, setLog] = useState([]);
   const [routeData, setRouteData] = useState([]);
+  const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
   // Log output
   const updateLog = (input) => {
@@ -22,8 +23,7 @@ function App() {
   };
 
   // Route form submission (validates coordinate input)
-  const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
-  const handleSubmit = (location) => {
+  const handleSubmitLocation = (location) => {
     const newDest = {
       latitude: location.latitude,
       longitude: location.longitude,
@@ -38,7 +38,7 @@ function App() {
   };
 
   // Map click-on location input
-  const handleClick = useCallback(
+  const handleSelectCoord = useCallback(
     (location) => {
       const newDest = {
         latitude: location.lat,
@@ -50,7 +50,7 @@ function App() {
   );
 
   // Route table delete
-  const handleDelete = (index) => {
+  const handleDeleteRoute = (index) => {
     setRouteData((prevData) => {
       const newData = [...prevData];
       newData.splice(index, 1);
@@ -60,11 +60,11 @@ function App() {
 
   // Send route data to backend
   const sendRoutePlan = async () => {
-    console.log("run pressed");
     try {
       const response = await axios.post("/api/route-plan", routeData);
       window.alert("Sent planned route.");
       console.log(response.data);
+      setRouteData([]);
     } catch (error) {
       console.error("Error sending route plan to backend:", error);
     }
@@ -79,53 +79,29 @@ function App() {
     >
       <Grid container spacing={2}>
         <Grid xs={12} style={{ height: "7vh" }}>
-          <Header onSendRoutePlan={sendRoutePlan} />
+          <Header />
         </Grid>
         <Grid xs={4} style={{ height: "60vh" }}>
           <LogContainer logData={log} />
         </Grid>
         <Grid xs={8} style={{ height: "60vh" }}>
-          <MapContainer handleClick={handleClick} />
+          <MapContainer handleSelectCoord={handleSelectCoord} />
         </Grid>
         <Grid xs={4}>
-          <RouteForm handleSubmit={handleSubmit} />
+          <RouteForm handleSubmitLocation={handleSubmitLocation} />
         </Grid>
         <Grid xs={5}>
-          <RouteTable routeData={routeData} onDelete={handleDelete} />
+          <RouteTable
+            routeData={routeData}
+            onDeleteRoute={handleDeleteRoute}
+            onSendRoutePlan={sendRoutePlan}
+          />
         </Grid>
         <Grid xs={3} style={{ height: "30vh" }}>
           <ArrowKeys updateLog={updateLog} />
         </Grid>
       </Grid>
     </Box>
-    // <div>
-    //   {/* Header Row */}
-    //   <Grid container spacing={2}>
-    //     <Grid item xs={12}>
-    //       <Header />
-    //     </Grid>
-
-    //     {/* Log Column */}
-    //     <Grid item xs={12} md={4}>
-    //       <LogContainer direction={directionLog} style={{ height: "100%" }} />
-    //     </Grid>
-
-    //     {/* Google Maps */}
-    //     <Grid item xs={12} md={8}>
-    //       <MapContainer />
-    //     </Grid>
-
-    //     {/* Route Input */}
-    //     <Grid item xs={12} md={8}>
-    //       <RoutePlanner />
-    //     </Grid>
-
-    //     {/* Manual Controls */}
-    //     <Grid item xs={12} md={4}>
-    //       <ArrowKeys onDirectionChange={handleDirectionChange} />
-    //     </Grid>
-    //   </Grid>
-    // </div>
   );
 }
 

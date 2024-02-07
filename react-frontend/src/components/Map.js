@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 
-function MapContainer({ handleClick }) {
+function MapContainer({ handleSelectCoord }) {
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   const mapStyles = {
@@ -51,10 +51,10 @@ function MapContainer({ handleClick }) {
         marker.setPosition(clickedLatLng);
 
         // Add to route table
-        handleClick(clickedLatLng);
+        handleSelectCoord(clickedLatLng);
       });
     }
-  }, [isLoaded, handleClick]);
+  }, [isLoaded, handleSelectCoord]);
 
   if (loadError) return "Error loading Google Maps";
   if (!isLoaded) return "Loading...";

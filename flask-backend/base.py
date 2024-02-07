@@ -7,13 +7,18 @@ api = Flask(__name__)
 CORS(api, origins="*")
 
 
-
 @api.route('/api')
 def debug():
     response_body = {
         "check": "frontend connected to backend",
     }
     return response_body
+
+@api.route('/api/connect',  methods=["POST"])
+def connect_to_rover():
+    connectionData = request.get_json()
+    print(connectionData)
+    return jsonify({"message": f"Received connection: {connectionData}"}) 
 
 
 @api.route('/api/arrow-keys', methods=["POST"])

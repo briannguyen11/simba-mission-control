@@ -1,13 +1,17 @@
 import React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import IconButton from "@mui/material/IconButton";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Grid,
+  Typography,
+  Button,
+  IconButton,
+} from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
-import { Typography } from "@mui/material";
 
 function RouteTable(props) {
   return (
@@ -26,9 +30,35 @@ function RouteTable(props) {
           padding: "10px",
         }}
       >
-        <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
-          Route Table
-        </Typography>
+        <Grid container item xs={12}>
+          <Grid item xs={8}>
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+              Route Table
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                style={{ width: "100px", height: "30px", marginRight: "5px" }}
+                onClick={props.onSendRoutePlan}
+              >
+                Run
+              </Button>
+              <Button
+                variant="contained"
+                style={{
+                  width: "100px",
+                  height: "30px",
+                  backgroundColor: "red",
+                }}
+              >
+                Stop
+              </Button>
+            </div>
+          </Grid>
+        </Grid>
+
         <TableContainer
           style={{
             border: "1px solid white",
@@ -74,7 +104,7 @@ function RouteTable(props) {
                   </TableCell>
                   <TableCell>
                     <IconButton
-                      onClick={() => props.onDelete(index)}
+                      onClick={() => props.onDeleteRoute(index)}
                       color="error"
                     >
                       <ClearIcon fontSize="small" />
