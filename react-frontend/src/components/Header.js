@@ -8,18 +8,41 @@ function Header() {
     ip: "",
     port: "",
   });
+  const [isConnected, setIsConnected] = useState(false);
+  const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
   function handleChange(event) {
     const { name, value } = event.target;
     setConnectionData({ ...connectionData, [name]: value });
   }
 
-  const sendConnectionRequest = async () => {
+  const sendConnectRequest = async () => {
+    const { port } = connectionData;
+    if (isConnected === false) {
+      if (isNumber(port)) {
+        try {
+          const response = await axios.post("/api/connect", connectionData);
+          if (response.data.message === "Success") {
+            setIsConnected(true);
+          }
+        } catch (error) {
+          console.error("Error connecting to rover:", error);
+        }
+      } else {
+        window.alert("Invalid input. Port must be a number.");
+      }
+    }
+  };
+
+  const sendDisconnectRequest = async () => {
     try {
-      const response = await axios.post("/api/connect", connectionData);
-      console.log(response.data);
+      const response = await axios.post("/api/disconnect");
+      if (response.data.message === "Success") {
+        setIsConnected(false);
+        setConnectionData({ ip: "", port: "" });
+      }
     } catch (error) {
-      console.error("Error sending route plan to backend:", error);
+      console.error("Error disconnecting to rover:", error);
     }
   };
 
@@ -37,10 +60,10 @@ function Header() {
       }}
     >
       <Grid container spacing={2} xs={12}>
-        <Grid item xs={8} sx={{ display: "flex", alignItems: "center" }}>
+        <Grid xs={7} sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h6">SIMBA Mission Control</Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid xs={5}>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <TextField
               id="ip"
@@ -104,11 +127,27 @@ function Header() {
 
             <Button
               variant="contained"
-              onClick={sendConnectionRequest}
-              style={{ backgroundColor: "#FD7F20", color: "white" }}
+              onClick={sendConnectRequest}
+              style={{
+                backgroundColor: isConnected ? "green" : "#FD7F20",
+                color: "white",
+              }}
             >
-              Connect
+              {isConnected ? "Connected" : "Connect"}
             </Button>
+            {isConnected && (
+              <Button
+                variant="contained"
+                onClick={sendDisconnectRequest}
+                style={{
+                  backgroundColor: "red",
+                  color: "white",
+                  marginLeft: "5px",
+                }}
+              >
+                Disconnect
+              </Button>
+            )}
           </div>
         </Grid>
       </Grid>

@@ -40,7 +40,7 @@ function RouteForm({ handleSubmitLocation }) {
           Coordinate Input
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <TextField
               id="latitude"
               name="latitude"
@@ -70,7 +70,7 @@ function RouteForm({ handleSubmitLocation }) {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <TextField
               id="longitude"
               name="longitude"
@@ -100,7 +100,7 @@ function RouteForm({ handleSubmitLocation }) {
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Button variant="contained" onClick={submitForm} fullWidth>
               Submit
             </Button>
