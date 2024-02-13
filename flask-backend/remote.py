@@ -39,11 +39,11 @@ def send_cmd_to_rover(client_socket, flg, msg):
         payload = msg
         payload_len = len(msg) if payload is not None else 0
         message = f"{synch}${flag}${payload_len}${payload}"
-        print(client_socket)
-        print(message) #debug
+        buffer = message.ljust(1024, '\0').encode()
         
         # Send message to server
-        client_socket.sendall(message.encode())
+        client_socket.sendall(buffer)
+        print(message) #debug
 
     except Exception as e:
         print("Error:", e)
