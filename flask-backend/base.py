@@ -9,6 +9,7 @@ CORS(api, origins="*")
 # global var
 client_socket = 0
 
+
 # @route   GET api/test
 # @desc    Returns simple json body
 # @access  Public
@@ -18,6 +19,7 @@ def debug():
         "check": "frontend connected to backend",
     }
     return response_body
+
 
 # @route   POST api/connect
 # @desc    Connects to rover server
@@ -29,9 +31,12 @@ def connect_to_rover():
     server_ip = connectionData.get("ip")
     server_port = int(connectionData.get("port"))
 
-    # override client_socket global variable with new value
+    # connect and override client_socket global variable with new value
     client_socket = remote.conn_to_rover(server_ip, server_port)
-    if client_socket is not None:
+
+    # receive acknowledgment from the server
+    ack_message = client_socket.recv(1024).decode()
+    if ack_message == "ACK":
         return jsonify({"message": "Success"})
     else:
         return jsonify({"error": "Fail"})
@@ -58,15 +63,16 @@ def handle_arrow_keys():
     direction = data.get('direction', '')
     
     if direction == "ArrowUp":
-        remote.send_cmd_to_rover(client_socket, 2, None)
+        remote.send_cmd_to_rover(client_socket, 2, direction)
     elif direction == "ArrowRight":
-        remote.send_cmd_to_rover(client_socket, 2, None)
+        remote.send_cmd_to_rover(client_socket, 2, direction)
     elif direction == "ArrowLeft":
-        remote.send_cmd_to_rover(client_socket, 2, None)
+        remote.send_cmd_to_rover(client_socket, 2, direction)
     elif direction == "ArrowDown":
-        remote.send_cmd_to_rover(client_socket, 2, None)
+        remote.send_cmd_to_rover(client_socket, 2, direction)
 
     return jsonify({"message": f"Received arrow key: {direction}"})
+
 
 # @route   POST api/route-plan
 # @desc    Handles route plan list

@@ -24,6 +24,8 @@ function Header() {
           const response = await axios.post("/api/connect", connectionData);
           if (response.data.message === "Success") {
             setIsConnected(true);
+          } else {
+            window.alert("Failed to connect to rover with given input.");
           }
         } catch (error) {
           console.error("Error connecting to rover:", error);
