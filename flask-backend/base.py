@@ -12,28 +12,6 @@ CORS(api, origins="*")
 client_socket = None
 
 
-# @desc    Listening for disconnect from server
-# @access  Private
-def handle_server_disconnect():
-    global client_socket
-    while True:
-        if client_socket is not None:
-            try:
-                data = remote.recv_from_rover(client_socket)
-                if data == "DISCONNECT":
-                    print("Server disconnected")
-                    client_socket.close()
-                    client_socket = None
-                    break
-            except Exception as e:
-                print(f"Error handling disconnection: {e}")
-        time.sleep(1)
-
-disconnection_thread = threading.Thread(target=handle_server_disconnect)
-disconnection_thread.daemon = True
-disconnection_thread.start()
-
-
 # @route   GET api/test
 # @desc    Returns simple json body
 # @access  Public
@@ -74,9 +52,9 @@ def connect_to_rover():
 def disconnect_from_rover():
     res = remote.disconn_from_rover(client_socket)
     if res == 0:
-        return jsonify({"message": "Successfully disconnected"})
+        return jsonify({"message": "Successfully disconnected"}), 200
     else:
-        return jsonify({"error": "Failed to disconnect"})
+        return jsonify({"error": "Failed to disconnect"}), 400
 
 
 # @route   POST api/arrow-keys
@@ -96,7 +74,7 @@ def handle_arrow_keys():
     elif direction == "ArrowDown":
         remote.send_to_rover(client_socket, 2, direction)
 
-    return jsonify({"message": f"Received {direction}"})
+    return jsonify({"message": f"Received {direction}"}), 200
 
 
 # @route   POST api/route-plan
@@ -112,12 +90,42 @@ def handle_route_plan():
 
             # Perform additional logic based on the received route data
 
-            return jsonify({"message": "Received route data"})
+            return jsonify({"message": "Received route data"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 400  
     else:
         # GET requests
         return jsonify({"route_data": route_data })
+    
+
+# @route   POST api/motor-speed
+# @desc    Sets motor speed
+# @access  Public
+@api.route('/api/motor-speed', methods=["POST"])
+def handle_motor_speed():
+    try:
+        data = request.get_json()
+        motor_speed = data.get('motorSpeed', '')
+        remote.send_to_rover(client_socket, 3, motor_speed)
+        print(f"Motor speed: {motor_speed}")
+        return jsonify({"message": f"Received motor speed: {motor_speed}"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400  
+    
+# @route   POST api/motor-dist
+# @desc    Sets motor dist
+# @access  Public
+@api.route('/api/motor-dist', methods=["POST"])
+def handle_motor_dist():
+    try:
+        data = request.get_json()
+        motor_dist = data.get('motorDist', '')
+        remote.send_to_rover(client_socket, 3, motor_dist)
+        print(f"Motor dist: {motor_dist}")
+        return jsonify({"message": f"Received motor distance: {motor_dist}"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400  
+
 
 
 if __name__ == '__main__':

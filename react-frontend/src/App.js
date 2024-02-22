@@ -6,7 +6,7 @@ import Header from "./components/Header";
 import LogContainer from "./components/Log";
 import MapContainer from "./components/Map";
 import ArrowKeys from "./components/ArrowKeys";
-import RouteForm from "./components/RouteForm";
+import UserInput from "./components/UserInput";
 import RouteTable from "./components/RouteTable";
 
 function App() {
@@ -44,7 +44,11 @@ function App() {
           <MapContainer setRouteData={setRouteData} />
         </Grid>
         <Grid item xs={4}>
-          <RouteForm setRouteData={setRouteData} />
+          <UserInput
+            updateLog={updateLog}
+            setRouteData={setRouteData}
+            isConnected={isConnected}
+          />
         </Grid>
         <Grid item xs={5}>
           <RouteTable

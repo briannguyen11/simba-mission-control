@@ -108,7 +108,7 @@ export default function ArrowKeys({ updateLog, isConnected }) {
       }}
     >
       <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
-        Manual Control
+        Rover Control
       </Typography>
 
       <Grid container spacing={1} justifyContent={"center"}>
