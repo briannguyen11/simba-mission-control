@@ -69,8 +69,9 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
     if (isConnected === true) {
       try {
         const response = await axios.post("/api/disconnect");
-        if (response.data.message === "Success") {
+        if (response.data.message === "Successfully disconnected") {
           setIsConnected(false);
+          updateLog(response.data.message);
           setConnectionData({ ip: "", port: "" });
         }
       } catch (error) {

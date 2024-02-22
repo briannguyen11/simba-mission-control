@@ -10,7 +10,28 @@ CORS(api, origins="*")
 
 # Global Variables
 client_socket = None
-ping_interval = 5 
+
+
+# @desc    Listening for disconnect from server
+# @access  Private
+def handle_server_disconnect():
+    global client_socket
+    while True:
+        if client_socket is not None:
+            try:
+                data = remote.recv_from_rover(client_socket)
+                if data == "DISCONNECT":
+                    print("Server disconnected")
+                    client_socket.close()
+                    client_socket = None
+                    break
+            except Exception as e:
+                print(f"Error handling disconnection: {e}")
+        time.sleep(1)
+
+disconnection_thread = threading.Thread(target=handle_server_disconnect)
+disconnection_thread.daemon = True
+disconnection_thread.start()
 
 
 # @route   GET api/test
@@ -39,7 +60,7 @@ def connect_to_rover():
 
     # receive acknowledgment from the server
     if client_socket != -1:
-        ack_message = client_socket.recv(1024).decode()
+        ack_message = remote.recv_from_rover(client_socket)
         if ack_message == "ACK":
             return jsonify({"message": f"Connected to IP: {server_ip} and Port: {server_port}"}), 200
     else:
@@ -53,9 +74,9 @@ def connect_to_rover():
 def disconnect_from_rover():
     res = remote.disconn_from_rover(client_socket)
     if res == 0:
-        return jsonify({"message": "Success"})
+        return jsonify({"message": "Successfully disconnected"})
     else:
-        return jsonify({"error": "Fail"})
+        return jsonify({"error": "Failed to disconnect"})
 
 
 # @route   POST api/arrow-keys
@@ -67,13 +88,13 @@ def handle_arrow_keys():
     direction = data.get('direction', '')
     
     if direction == "ArrowUp":
-        remote.send_cmd_to_rover(client_socket, 2, direction)
+        remote.send_to_rover(client_socket, 2, direction)
     elif direction == "ArrowRight":
-        remote.send_cmd_to_rover(client_socket, 2, direction)
+        remote.send_to_rover(client_socket, 2, direction)
     elif direction == "ArrowLeft":
-        remote.send_cmd_to_rover(client_socket, 2, direction)
+        remote.send_to_rover(client_socket, 2, direction)
     elif direction == "ArrowDown":
-        remote.send_cmd_to_rover(client_socket, 2, direction)
+        remote.send_to_rover(client_socket, 2, direction)
 
     return jsonify({"message": f"Received {direction}"})
 

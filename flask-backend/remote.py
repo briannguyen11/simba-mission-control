@@ -22,22 +22,20 @@ def conn_to_rover(server_ip, server_port):
 # @param (int) client_socket
 ###################################################
 def disconn_from_rover(client_socket):
-    global isConnected
     try:
         client_socket.close()
-        isConnected = False
         return 0
     except Exception as e:
         print("Error occurred while closing socket:", e)
         return -1
 
 ###################################################
-# @desc Send command to rover using connected socket
+# @desc Send command to rover
 # @param (int) client_socket
 # @param (int) flg
 # @param (str) msg
 ###################################################
-def send_cmd_to_rover(client_socket, flg, msg):
+def send_to_rover(client_socket, flg, msg):
     try:
         # Create formatted message using $ as delim
         synch = "SIMBA" 
@@ -54,11 +52,26 @@ def send_cmd_to_rover(client_socket, flg, msg):
         print("Error:", e)
 
 
-## debug ###
-# def main():
-#     client_socket = conn_to_rover('127.0.0.1', 6999)
+###################################################
+# @desc Recv msg from rover 
+# @param (int) client_socket
+###################################################
+def recv_from_rover(client_socket):
+    try:
+        data = client_socket.recv(1024)
+        if not data:
+            return None
+        return data.decode()
+    except Exception as e:
+        print("Error receiving data:", e)
+        return None
 
-#     send_cmd_to_rover(client_socket, 2, "hello?")
+
+# debug ###
+# def main():
+#     client_socket = conn_to_rover('127.0.0.1', 6500)
+
+#     send_to_rover(client_socket, 2, "hello?")
 
 #     disconn_from_rover(client_socket)
 
