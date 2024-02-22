@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+// Map.js
+
+import React, { useEffect, useCallback } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 
-function MapContainer({ handleSelectCoord }) {
+function MapContainer({ setRouteData }) {
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   const mapStyles = {
@@ -15,6 +17,17 @@ function MapContainer({ handleSelectCoord }) {
     version: "weekly", // Specify the version of Google Maps API
     scriptLoading: "async", // Load the script asynchronously
   });
+
+  const handleSelectCoord = useCallback(
+    (location) => {
+      const newDest = {
+        latitude: location.lat,
+        longitude: location.lng,
+      };
+      setRouteData((prevData) => [...prevData, newDest]);
+    },
+    [setRouteData]
+  );
 
   // Re-renders map if need to re-mount to DOM
   useEffect(() => {

@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import {
   Table,
   TableHead,
@@ -13,7 +14,30 @@ import {
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 
-function RouteTable(props) {
+function RouteTable({ routeData, setRouteData, isConnected }) {
+  const handleDeleteRoute = (index) => {
+    setRouteData((prevData) => {
+      const newData = [...prevData];
+      newData.splice(index, 1);
+      return newData;
+    });
+  };
+
+  const sendRoutePlan = async () => {
+    if (isConnected) {
+      try {
+        const response = await axios.post("/api/route-plan", routeData);
+        window.alert("Sent planned route.");
+        console.log(response.data);
+        setRouteData([]);
+      } catch (error) {
+        console.error("Error sending route plan to backend:", error);
+      }
+    } else {
+      alert("Rover not connected.");
+    }
+  };
+
   return (
     <div
       style={{
@@ -41,7 +65,7 @@ function RouteTable(props) {
               <Button
                 variant="contained"
                 style={{ width: "100px", height: "30px", marginRight: "5px" }}
-                onClick={props.onSendRoutePlan}
+                onClick={sendRoutePlan}
               >
                 Run
               </Button>
@@ -84,7 +108,7 @@ function RouteTable(props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.routeData.map((route, index) => (
+              {routeData.map((route, index) => (
                 <TableRow
                   key={index}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -104,7 +128,7 @@ function RouteTable(props) {
                   </TableCell>
                   <TableCell>
                     <IconButton
-                      onClick={() => props.onDeleteRoute(index)}
+                      onClick={() => handleDeleteRoute(index)}
                       color="error"
                     >
                       <ClearIcon fontSize="small" />

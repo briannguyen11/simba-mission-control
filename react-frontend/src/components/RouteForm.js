@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Unstable_Grid2";
+// RouteForm.js
 
-function RouteForm({ handleSubmitLocation }) {
+import React, { useState } from "react";
+import { Typography, Button, TextField, Grid } from "@mui/material";
+
+function RouteForm({ setRouteData }) {
   const [location, setLocation] = useState({
     latitude: "",
     longitude: "",
   });
+
+  const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -16,7 +17,11 @@ function RouteForm({ handleSubmitLocation }) {
   }
 
   function submitForm() {
-    handleSubmitLocation(location);
+    if (isNumber(location.latitude) && isNumber(location.longitude)) {
+      setRouteData((prevData) => [...prevData, location]);
+    } else {
+      alert("Invalid input. Latitude and longitude must be valid numbers.");
+    }
     setLocation({ latitude: "", longitude: "" });
   }
 
@@ -40,7 +45,7 @@ function RouteForm({ handleSubmitLocation }) {
           Coordinate Input
         </Typography>
         <Grid container spacing={2}>
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <TextField
               id="latitude"
               name="latitude"
@@ -70,7 +75,7 @@ function RouteForm({ handleSubmitLocation }) {
               }}
             />
           </Grid>
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <TextField
               id="longitude"
               name="longitude"
@@ -100,7 +105,7 @@ function RouteForm({ handleSubmitLocation }) {
               }}
             />
           </Grid>
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <Button variant="contained" onClick={submitForm} fullWidth>
               Submit
             </Button>

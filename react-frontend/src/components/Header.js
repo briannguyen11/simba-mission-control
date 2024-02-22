@@ -1,58 +1,91 @@
+// Header.js
+
 import React, { useState } from "react";
 import axios from "axios";
-import { Button, Typography, TextField } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
 
-function Header() {
+import { Button, Typography, TextField, Grid, Box } from "@mui/material";
+
+const inputLabelStyle = {
+  color: "white",
+};
+
+const inputStyle = {
+  color: "white",
+  marginRight: "5px",
+};
+
+const outlinedInputStyle = {
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "white",
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "white",
+  },
+  "& input": {
+    color: "white",
+  },
+};
+
+export default function Header({ updateLog, isConnected, setIsConnected }) {
   const [connectionData, setConnectionData] = useState({
     ip: "",
     port: "",
   });
-  const [isConnected, setIsConnected] = useState(false);
+
+  // validates input is number
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
+  // update text field data
   function handleChange(event) {
     const { name, value } = event.target;
     setConnectionData({ ...connectionData, [name]: value });
   }
 
+  // connect to tover
   const sendConnectRequest = async () => {
     const { port } = connectionData;
     if (isConnected === false) {
       if (isNumber(port)) {
         try {
           const response = await axios.post("/api/connect", connectionData);
-          if (response.data.message === "Success") {
+          if (response && response.status === 200) {
             setIsConnected(true);
+            updateLog(response.data.message);
           } else {
-            window.alert("Failed to connect to rover with given input.");
+            alert("Failed to connect to rover with given input.");
           }
         } catch (error) {
-          console.error("Error connecting to rover:", error);
+          console.log(error);
+          alert("Error connecting to rover");
         }
       } else {
-        window.alert("Invalid input. Port must be a number.");
+        alert("Invalid input. Port must be a number.");
       }
     }
   };
 
+  // disconnect from rover
   const sendDisconnectRequest = async () => {
-    try {
-      const response = await axios.post("/api/disconnect");
-      if (response.data.message === "Success") {
-        setIsConnected(false);
-        setConnectionData({ ip: "", port: "" });
+    if (isConnected === true) {
+      try {
+        const response = await axios.post("/api/disconnect");
+        if (response.data.message === "Success") {
+          setIsConnected(false);
+          setConnectionData({ ip: "", port: "" });
+        }
+      } catch (error) {
+        console.error("Error disconnecting to rover:", error);
       }
-    } catch (error) {
-      console.error("Error disconnecting to rover:", error);
+    } else {
+      alert("Rover already disconnected.");
     }
   };
 
   return (
-    <div
+    <Box
       style={{
-        height: "100%",
         width: "100%",
+        height: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -61,12 +94,14 @@ function Header() {
         borderRadius: "5px",
       }}
     >
-      <Grid container spacing={2} xs={12}>
-        <Grid xs={7} sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h6">SIMBA Mission Control</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={7} sx={{ display: "flex", alignItems: "center" }}>
+          <Typography sx={{ marginLeft: "10px" }} variant="h6">
+            SIMBA Mission Control
+          </Typography>
         </Grid>
-        <Grid xs={5}>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Grid item xs={5}>
+          <Box style={{ display: "flex", justifyContent: "flex-end" }}>
             <TextField
               id="ip"
               name="ip"
@@ -76,24 +111,11 @@ function Header() {
               value={connectionData.ip}
               onChange={handleChange}
               InputLabelProps={{
-                style: {
-                  color: "white",
-                },
+                style: inputLabelStyle,
               }}
               InputProps={{
-                sx: {
-                  color: "white",
-                  marginRight: "5px",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "white",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "white",
-                  },
-                  "& input": {
-                    color: "white",
-                  },
-                },
+                style: inputStyle,
+                sx: outlinedInputStyle,
               }}
             />
 
@@ -106,24 +128,11 @@ function Header() {
               value={connectionData.port}
               onChange={handleChange}
               InputLabelProps={{
-                style: {
-                  color: "white",
-                },
+                style: inputLabelStyle,
               }}
               InputProps={{
-                sx: {
-                  color: "white",
-                  marginRight: "5px",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "white",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "white",
-                  },
-                  "& input": {
-                    color: "white",
-                  },
-                },
+                style: inputStyle,
+                sx: outlinedInputStyle,
               }}
             />
 
@@ -133,6 +142,7 @@ function Header() {
               style={{
                 backgroundColor: isConnected ? "green" : "#FD7F20",
                 color: "white",
+                marginRight: "10px",
               }}
             >
               {isConnected ? "Connected" : "Connect"}
@@ -145,16 +155,15 @@ function Header() {
                   backgroundColor: "red",
                   color: "white",
                   marginLeft: "5px",
+                  marginRight: "10px",
                 }}
               >
                 Disconnect
               </Button>
             )}
-          </div>
+          </Box>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 }
-
-export default Header;

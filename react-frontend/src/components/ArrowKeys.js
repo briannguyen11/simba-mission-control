@@ -1,13 +1,14 @@
+// ArrowKeys.js
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Typography } from "@mui/material";
+import { Typography, Grid } from "@mui/material";
 import UpArrowIcon from "../icons/UpArrowIcon";
 import DownArrowIcon from "../icons/DownArrowIcon";
 import RightArrowIcon from "../icons/RightArrowIcon.js";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
-import Grid from "@mui/material/Unstable_Grid2";
 
-function ArrowKeys({ updateLog }) {
+function ArrowKeys({ updateLog, isConnected }) {
   const [highlightedKey, setHighlightedKey] = useState(null);
   const [arrowSize, setArrowSize] = useState(24);
 
@@ -28,7 +29,6 @@ function ArrowKeys({ updateLog }) {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    // cleanup the event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -52,23 +52,21 @@ function ArrowKeys({ updateLog }) {
 
       setHighlightedKey(direction);
 
-      // update log when arrow keys passed, not any key press
-      if (direction != null) {
-        updateLog(direction);
-      }
-
-      try {
-        const response = await axios.post("/api/arrow-keys", {
-          direction,
-        });
-        if (direction != null) {
-          console.log(response.data);
+      if (direction !== null) {
+        if (isConnected) {
+          try {
+            const response = await axios.post("/api/arrow-keys", {
+              direction,
+            });
+            updateLog(response.data.message);
+          } catch (error) {
+            console.error("Error making request:", error);
+          }
+        } else {
+          alert("Rover not connected.");
         }
-      } catch (error) {
-        console.error("Error making request:", error);
       }
     };
-
     const handleKeyUp = () => {
       setHighlightedKey(null);
     };
@@ -80,7 +78,7 @@ function ArrowKeys({ updateLog }) {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [updateLog]);
+  }, [updateLog, isConnected]);
 
   return (
     <div
@@ -100,7 +98,7 @@ function ArrowKeys({ updateLog }) {
         </Typography>
 
         <Grid container spacing={1}>
-          <Grid item>
+          <Grid>
             <div
               style={{
                 background:
@@ -112,7 +110,7 @@ function ArrowKeys({ updateLog }) {
           </Grid>
         </Grid>
         <Grid container spacing={1}>
-          <Grid item>
+          <Grid>
             <div
               style={{
                 background:
@@ -122,7 +120,7 @@ function ArrowKeys({ updateLog }) {
               <LeftArrowIcon size={arrowSize} />
             </div>
           </Grid>
-          <Grid item>
+          <Grid>
             <div
               style={{
                 background:
@@ -132,7 +130,7 @@ function ArrowKeys({ updateLog }) {
               <DownArrowIcon size={arrowSize} />
             </div>
           </Grid>
-          <Grid item>
+          <Grid>
             <div
               style={{
                 background:
