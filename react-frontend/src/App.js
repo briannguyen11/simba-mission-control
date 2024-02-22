@@ -30,17 +30,17 @@ function App() {
       }}
     >
       <Grid container spacing={2} sx={{ p: 2 }}>
-        <Grid item xs={12} style={{ height: "7vh" }}>
+        <Grid item xs={12}>
           <Header
             updateLog={updateLog}
             isConnected={isConnected}
             setIsConnected={setIsConnected}
           />
         </Grid>
-        <Grid item xs={4} style={{ height: "60vh" }}>
+        <Grid item xs={4}>
           <LogContainer logData={log} />
         </Grid>
-        <Grid item xs={8} style={{ height: "60vh" }}>
+        <Grid item xs={8}>
           <MapContainer setRouteData={setRouteData} />
         </Grid>
         <Grid item xs={4}>
@@ -53,7 +53,7 @@ function App() {
             isConnected={isConnected}
           />
         </Grid>
-        <Grid item xs={3} style={{ height: "30vh" }}>
+        <Grid item xs={3}>
           <ArrowKeys updateLog={updateLog} isConnected={isConnected} />
         </Grid>
       </Grid>

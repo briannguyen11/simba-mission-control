@@ -11,6 +11,7 @@ import {
   Typography,
   Button,
   IconButton,
+  Box,
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -39,108 +40,102 @@ function RouteTable({ routeData, setRouteData, isConnected }) {
   };
 
   return (
-    <div
+    <Box
       style={{
-        height: "100%",
-        border: "1px solid white",
+        height: "300px",
+        backgroundColor: "#537072",
         borderRadius: "5px",
         overflow: "auto",
+        color: "white",
+        padding: "10px",
       }}
     >
-      <div
+      <Grid container item xs={12}>
+        <Grid item xs={8}>
+          <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+            Route Table
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              style={{ width: "100px", height: "30px", marginRight: "5px" }}
+              onClick={sendRoutePlan}
+            >
+              Run
+            </Button>
+            <Button
+              variant="contained"
+              style={{
+                width: "100px",
+                height: "30px",
+                backgroundColor: "red",
+              }}
+            >
+              Stop
+            </Button>
+          </div>
+        </Grid>
+      </Grid>
+
+      <TableContainer
         style={{
-          flex: 1,
-          color: "white",
-          padding: "10px",
+          border: "1px solid white",
+          maxHeight: "240px",
+          overflowY: "auto",
         }}
       >
-        <Grid container item xs={12}>
-          <Grid item xs={8}>
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
-              Route Table
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button
-                variant="contained"
-                style={{ width: "100px", height: "30px", marginRight: "5px" }}
-                onClick={sendRoutePlan}
+        <Table size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Route #
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Latitude
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Longitude
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", color: "white" }}>
+                Clear
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {routeData.map((route, index) => (
+              <TableRow
+                key={index}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                Run
-              </Button>
-              <Button
-                variant="contained"
-                style={{
-                  width: "100px",
-                  height: "30px",
-                  backgroundColor: "red",
-                }}
-              >
-                Stop
-              </Button>
-            </div>
-          </Grid>
-        </Grid>
-
-        <TableContainer
-          style={{
-            border: "1px solid white",
-            maxHeight: "240px",
-            overflowY: "auto",
-          }}
-        >
-          <Table size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ fontWeight: "bold", color: "white" }}>
-                  Route #
+                <TableCell
+                  component="th"
+                  scope="row"
+                  style={{ color: "white" }}
+                >
+                  {index + 1}
                 </TableCell>
-                <TableCell style={{ fontWeight: "bold", color: "white" }}>
-                  Latitude
+                <TableCell style={{ color: "white" }}>
+                  {route.latitude}
                 </TableCell>
-                <TableCell style={{ fontWeight: "bold", color: "white" }}>
-                  Longitude
+                <TableCell style={{ color: "white" }}>
+                  {route.longitude}
                 </TableCell>
-                <TableCell style={{ fontWeight: "bold", color: "white" }}>
-                  Clear
+                <TableCell>
+                  <IconButton
+                    onClick={() => handleDeleteRoute(index)}
+                    color="error"
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {routeData.map((route, index) => (
-                <TableRow
-                  key={index}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    style={{ color: "white" }}
-                  >
-                    {index + 1}
-                  </TableCell>
-                  <TableCell style={{ color: "white" }}>
-                    {route.latitude}
-                  </TableCell>
-                  <TableCell style={{ color: "white" }}>
-                    {route.longitude}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      onClick={() => handleDeleteRoute(index)}
-                      color="error"
-                    >
-                      <ClearIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-    </div>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }
 

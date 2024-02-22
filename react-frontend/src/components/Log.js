@@ -1,7 +1,7 @@
 // Log.js
 
 import React from "react";
-import Typography from "@mui/material/Typography";
+import { Typography, Box } from "@mui/material";
 
 const formatTime = (time) => {
   const logTime = new Date(time);
@@ -15,39 +15,31 @@ const formatTime = (time) => {
   return formattedTime;
 };
 
-function LogContainer({ logData }) {
+export default function LogContainer({ logData }) {
   return (
-    <div
+    <Box
       style={{
-        height: "100%",
-        border: "1px solid white",
+        height: "600px",
+        backgroundColor: "#537072",
         borderRadius: "5px",
         overflow: "auto",
+        color: "white",
+        padding: "10px",
       }}
     >
-      <div
-        style={{
-          flex: 1,
-          color: "white",
-          padding: "10px",
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
-          Direction Log
-        </Typography>
-        {logData
-          .slice()
-          .reverse()
-          .map((logEntry, index) => (
-            <div key={index}>
-              <Typography variant="body2" color="white">
-                {formatTime(logEntry.time)} - {logEntry.data}
-              </Typography>
-            </div>
-          ))}
-      </div>
-    </div>
+      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+        Direction Log
+      </Typography>
+      {logData
+        .slice()
+        .reverse()
+        .map((logEntry, index) => (
+          <div key={index}>
+            <Typography variant="body2" color="white">
+              {formatTime(logEntry.time)} - {logEntry.data}
+            </Typography>
+          </div>
+        ))}
+    </Box>
   );
 }
-
-export default LogContainer;

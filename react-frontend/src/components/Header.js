@@ -84,19 +84,31 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
   return (
     <Box
       style={{
-        width: "100%",
-        height: "100%",
+        height: "55px",
+        backgroundColor: "#537072",
+        borderRadius: "5px",
+        color: "white",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
-        color: "white",
-        border: "1px solid white",
-        borderRadius: "5px",
       }}
     >
       <Grid container spacing={2}>
         <Grid item xs={7} sx={{ display: "flex", alignItems: "center" }}>
-          <Typography sx={{ marginLeft: "10px" }} variant="h6">
+          <img
+            src={process.env.PUBLIC_URL + "/images/simba-logo.png"}
+            alt="Logo"
+            style={{
+              width: "35px",
+              height: "35px",
+              borderRadius: "50%",
+              marginRight: "15px",
+              display: "flex",
+              alignItems: "center",
+              marginLeft: "10px",
+              marginBottom: "5px",
+            }}
+          />
+          <Typography sx={{ marginLeft: "5px" }} variant="h6">
             SIMBA Mission Control
           </Typography>
         </Grid>

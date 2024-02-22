@@ -2,15 +2,10 @@
 
 import React, { useEffect, useCallback } from "react";
 import { useLoadScript } from "@react-google-maps/api";
+import { Box } from "@mui/material";
 
-function MapContainer({ setRouteData }) {
+export default function MapContainer({ setRouteData }) {
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-
-  const mapStyles = {
-    height: "100%",
-    width: "100%",
-    borderRadius: "5px",
-  };
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey,
@@ -72,7 +67,10 @@ function MapContainer({ setRouteData }) {
   if (loadError) return "Error loading Google Maps";
   if (!isLoaded) return "Loading...";
 
-  return <div id="map" style={mapStyles}></div>;
+  return (
+    <Box
+      id="map"
+      style={{ height: "620px", width: "100%", borderRadius: "5px" }}
+    ></Box>
+  );
 }
-
-export default MapContainer;

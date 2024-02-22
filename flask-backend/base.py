@@ -1,13 +1,16 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import threading
+import time
 
 import remote
 
 api = Flask(__name__)
 CORS(api, origins="*")
 
-# global var
-client_socket = 0
+# Global Variables
+client_socket = None
+ping_interval = 5 
 
 
 # @route   GET api/test
@@ -35,12 +38,13 @@ def connect_to_rover():
     client_socket = remote.conn_to_rover(server_ip, server_port)
 
     # receive acknowledgment from the server
-    ack_message = client_socket.recv(1024).decode()
-    if ack_message == "ACK":
-        return jsonify({"message": "Success"})
+    if client_socket != -1:
+        ack_message = client_socket.recv(1024).decode()
+        if ack_message == "ACK":
+            return jsonify({"message": f"Connected to IP: {server_ip} and Port: {server_port}"}), 200
     else:
-        return jsonify({"error": "Fail"})
-    
+        return jsonify({"error": "Fail"}), 400
+        
 
 # @route   POST api/disconnect
 # @desc    Disconnects from rover server
@@ -71,7 +75,7 @@ def handle_arrow_keys():
     elif direction == "ArrowDown":
         remote.send_cmd_to_rover(client_socket, 2, direction)
 
-    return jsonify({"message": f"Received arrow key: {direction}"})
+    return jsonify({"message": f"Received {direction}"})
 
 
 # @route   POST api/route-plan
