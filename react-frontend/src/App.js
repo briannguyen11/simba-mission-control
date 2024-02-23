@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-
 import Header from "./components/Header";
 import LogContainer from "./components/Log";
 import MapContainer from "./components/Map";
@@ -20,6 +20,44 @@ function App() {
     const newLog = [...log, { time: currentTime, data: input }];
     setLog(newLog);
   };
+
+  const updateLogCallback = useCallback(
+    (input) => {
+      const currentTime = new Date().getTime();
+      const newLog = [...log, { time: currentTime, data: input }];
+      setLog(newLog);
+    },
+    [log]
+  );
+
+  useEffect(() => {
+    const checkConnectionStatus = async () => {
+      try {
+        const response = await axios.get("/api/connection-status");
+        const status = response.data.connection;
+        console.log(status);
+        if (status === true) {
+          updateLogCallback("Connected");
+        } else {
+          alert("Disconnected from rover.");
+          updateLogCallback("Disconnected");
+        }
+        setIsConnected(status);
+      } catch (error) {
+        console.error("Error checking connection status:", error);
+      }
+    };
+
+    let intervalId;
+
+    if (isConnected) {
+      // Start checking connection status every few seconds
+      intervalId = setInterval(checkConnectionStatus, 5000);
+    }
+
+    // Cleanup function to stop interval when component unmounts or isConnected becomes false
+    return () => clearInterval(intervalId);
+  }, [isConnected, updateLogCallback]);
 
   return (
     <Box

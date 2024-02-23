@@ -11,7 +11,6 @@ CORS(api, origins="*")
 # Global Variables
 client_socket = None
 
-
 # @route   GET api/test
 # @desc    Returns simple json body
 # @access  Public
@@ -29,6 +28,7 @@ def debug():
 @api.route('/api/connect',  methods=["POST"])
 def connect_to_rover():
     global client_socket
+    global is_connected
     connectionData = request.get_json()
     server_ip = connectionData.get("ip")
     server_port = int(connectionData.get("port"))
@@ -38,8 +38,8 @@ def connect_to_rover():
 
     # receive acknowledgment from the server
     if client_socket != -1:
-        ack_message = remote.recv_from_rover(client_socket)
-        if ack_message == "ACK":
+        ack = remote.recv_from_rover(client_socket)
+        if ack == "ACK-0":
             return jsonify({"message": f"Connected to IP: {server_ip} and Port: {server_port}"}), 200
     else:
         return jsonify({"error": "Fail"}), 400
@@ -66,15 +66,19 @@ def handle_arrow_keys():
     direction = data.get('direction', '')
     
     if direction == "ArrowUp":
-        remote.send_to_rover(client_socket, 2, direction)
+        ack = remote.send_to_rover(client_socket, 2, direction)
     elif direction == "ArrowRight":
-        remote.send_to_rover(client_socket, 2, direction)
+        ack =remote.send_to_rover(client_socket, 2, direction)
     elif direction == "ArrowLeft":
-        remote.send_to_rover(client_socket, 2, direction)
+        ack =remote.send_to_rover(client_socket, 2, direction)
     elif direction == "ArrowDown":
-        remote.send_to_rover(client_socket, 2, direction)
+        ack = remote.send_to_rover(client_socket, 2, direction)
 
-    return jsonify({"message": f"Received {direction}"}), 200
+    if ack == "ACK-2":
+        return jsonify({"message": f"Received {direction}"}), 200
+    else: 
+        return jsonify({"message": f"Did not receive rover control ACK"}), 200
+
 
 
 # @route   POST api/route-plan
@@ -106,25 +110,42 @@ def handle_motor_speed():
     try:
         data = request.get_json()
         motor_speed = data.get('motorSpeed', '')
-        remote.send_to_rover(client_socket, 3, motor_speed)
-        print(f"Motor speed: {motor_speed}")
-        return jsonify({"message": f"Received motor speed: {motor_speed}"}), 200
+        ack = remote.send_to_rover(client_socket, 3, motor_speed)
+        if ack == "ACK-3":
+            return jsonify({"message": f"Received {motor_speed}"}), 200
+        else: 
+            return jsonify({"message": f"Did not receive motor speed ACK"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400  
     
+
 # @route   POST api/motor-dist
-# @desc    Sets motor dist
+# @desc    Sets motor distance
 # @access  Public
 @api.route('/api/motor-dist', methods=["POST"])
 def handle_motor_dist():
     try:
         data = request.get_json()
         motor_dist = data.get('motorDist', '')
-        remote.send_to_rover(client_socket, 3, motor_dist)
-        print(f"Motor dist: {motor_dist}")
-        return jsonify({"message": f"Received motor distance: {motor_dist}"}), 200
+        ack = remote.send_to_rover(client_socket, 4, motor_dist)
+        if ack == "ACK-4":
+            return jsonify({"message": f"Received {motor_dist}"}), 200
+        else: 
+            return jsonify({"message": f"Did not receive motor distance ACK"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400  
+
+
+# @route   POST api/connection-status
+# @desc    Checks connection status to rover
+# @access  Public
+@api.route('/api/connection-status', methods=["GET"])
+def connection_status():
+    status = False
+    ack = remote.send_to_rover(client_socket, 1, "PING")
+    if (ack == "ACK-1"):
+        status = True
+    return jsonify({"connection": status}), 200
 
 
 

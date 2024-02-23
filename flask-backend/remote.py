@@ -1,4 +1,5 @@
 import socket 
+import time
 
 
 ###################################################
@@ -11,7 +12,7 @@ def conn_to_rover(server_ip, server_port):
     try:
         client_socket.connect((server_ip, server_port))
         return client_socket
-
+    
     except Exception as e:
         print("Error:", e)
         return -1
@@ -30,26 +31,36 @@ def disconn_from_rover(client_socket):
         return -1
 
 ###################################################
-# @desc Send command to rover
+# @desc Send command to rover and waits for ACK
 # @param (int) client_socket
 # @param (int) flg
 # @param (str) msg
 ###################################################
-def send_to_rover(client_socket, flg, msg):
+def send_to_rover(client_socket, flg, msg, timeout=1):
     try:
         # Create formatted message using $ as delim
         synch = "SIMBA" 
         flag = flg
         payload = msg
-        payload_len = len(msg) if payload is not None else 0
-        message = f"{synch}${flag}${payload_len}${payload}"
+        message = f"{synch}${flag}${payload}"
         buffer = message.ljust(1024, '\0').encode()
+        
+        # Start timer
+        start_time = time.time()
         
         # Send message to server
         client_socket.sendall(buffer)
 
+        # Wait for acknowledgment
+        while True:
+            if time.time() - start_time > timeout:
+                print("timeout")
+                return None
+            ack = client_socket.recv(1024).decode().strip()
+            return ack
+
     except Exception as e:
-        print("Error:", e)
+        return "Error: " + str(e)
 
 
 ###################################################
