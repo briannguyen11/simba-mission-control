@@ -39,8 +39,8 @@ function App() {
         if (status === true) {
           updateLogCallback("Connected");
         } else {
-          alert("Disconnected from rover.");
           updateLogCallback("Disconnected");
+          alert("Disconnected from rover.");
         }
         setIsConnected(status);
       } catch (error) {
