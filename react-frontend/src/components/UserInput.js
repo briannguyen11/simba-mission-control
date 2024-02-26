@@ -30,6 +30,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     latitude: "",
     longitude: "",
   });
+  f;
 
   const [motorSpeed, setMotorSpeed] = useState("");
   const [motorDist, setMotorDist] = useState("");
