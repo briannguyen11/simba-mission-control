@@ -4,7 +4,7 @@ import React, { useEffect, useCallback } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { Box } from "@mui/material";
 
-export default function MapContainer({ setRouteData }) {
+export default function MapContainer({ routeData, setRouteData }) {
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   const { isLoaded, loadError } = useLoadScript({
@@ -26,43 +26,52 @@ export default function MapContainer({ setRouteData }) {
 
   // Re-renders map if need to re-mount to DOM
   useEffect(() => {
-    const defaultCenter = {
-      lat: 35.305,
-      lng: -120.6625,
-    };
-
-    const redMarkerIcon = {
-      url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-      scaledSize: { width: 30, height: 30 },
-    };
-
     if (isLoaded) {
       const map = new window.google.maps.Map(document.getElementById("map"), {
-        center: defaultCenter,
         zoom: 15,
+        center: {
+          lat: routeData[0]?.latitude || 35.305523,
+          lng: routeData[0]?.longitude || -120.664352,
+        },
       });
 
-      const marker = new window.google.maps.Marker({
-        position: defaultCenter,
-        map,
-        icon: redMarkerIcon,
+      const redMarkerIcon = {
+        url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        scaledSize: { width: 30, height: 30 },
+      };
+
+      routeData.forEach((coord) => {
+        new window.google.maps.Marker({
+          position: { lat: coord.latitude, lng: coord.longitude },
+          map: map,
+          icon: redMarkerIcon,
+        });
       });
 
-      // Gets coordinates of right click pointer
+      if (routeData.length > 1) {
+        const routePath = new window.google.maps.Polyline({
+          path: routeData.map((coord) => ({
+            lat: coord.latitude,
+            lng: coord.longitude,
+          })),
+          geodesic: true,
+          strokeColor: "#FF0000",
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+        });
+
+        routePath.setMap(map);
+      }
+
       window.google.maps.event.addListener(map, "rightclick", (event) => {
         const clickedLatLng = {
           lat: event.latLng.lat(),
           lng: event.latLng.lng(),
         };
-
-        // Update marker position
-        marker.setPosition(clickedLatLng);
-
-        // Add to route table
         handleSelectCoord(clickedLatLng);
       });
     }
-  }, [isLoaded, handleSelectCoord]);
+  }, [isLoaded, handleSelectCoord, routeData]);
 
   if (loadError) return "Error loading Google Maps";
   if (!isLoaded) return "Loading...";

@@ -79,7 +79,7 @@ function App() {
           <LogContainer logData={log} />
         </Grid>
         <Grid item xs={8}>
-          <MapContainer setRouteData={setRouteData} />
+          <MapContainer routeData={routeData} setRouteData={setRouteData} />
         </Grid>
         <Grid item xs={4}>
           <UserInput
