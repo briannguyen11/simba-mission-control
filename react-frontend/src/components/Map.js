@@ -63,6 +63,28 @@ export default function MapContainer({ routeData, setRouteData }) {
         routePath.setMap(map);
       }
 
+      // Calculate bounds of all coordinates
+      if (routeData.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        routeData.forEach((coord) => {
+          bounds.extend(
+            new window.google.maps.LatLng(coord.latitude, coord.longitude)
+          );
+        });
+
+        // Adjust map viewport to fit the bounds
+        const maxZoom = 18;
+        map.fitBounds(bounds);
+        const listener = window.google.maps.event.addListener(
+          map,
+          "idle",
+          function () {
+            if (map.getZoom() > maxZoom) map.setZoom(maxZoom);
+            window.google.maps.event.removeListener(listener);
+          }
+        );
+      }
+
       window.google.maps.event.addListener(map, "rightclick", (event) => {
         const clickedLatLng = {
           lat: event.latLng.lat(),
