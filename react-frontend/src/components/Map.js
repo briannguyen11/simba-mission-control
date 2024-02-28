@@ -73,7 +73,7 @@ export default function MapContainer({ routeData, setRouteData }) {
         });
 
         // Adjust map viewport to fit the bounds
-        const maxZoom = 18;
+        const maxZoom = 17;
         map.fitBounds(bounds);
         const listener = window.google.maps.event.addListener(
           map,
