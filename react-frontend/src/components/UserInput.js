@@ -101,7 +101,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     if (isConnected) {
       try {
         const response = await axios.post("/api/start-pickup");
-        if (response.data.message === "started pickup") {
+        if (response.data.message === "Started pickup") {
           updateLog("Pickup sequence: Started");
           setPickupDone(false);
           inProgCount = 0;
