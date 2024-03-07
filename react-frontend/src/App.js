@@ -35,7 +35,6 @@ function App() {
       try {
         const response = await axios.get("/api/connection-status");
         const status = response.data.connection;
-        console.log(status);
         if (status === true) {
           updateLogCallback("Connected");
         } else {

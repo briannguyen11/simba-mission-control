@@ -33,6 +33,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
 
   const [motorSpeed, setMotorSpeed] = useState("");
   const [motorDist, setMotorDist] = useState("");
+  const [pickupDone, setPickupDone] = useState(true);
 
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
@@ -94,6 +95,46 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     }
   };
 
+  let inProgCount;
+  let armPickupInterval;
+  const sendStartArm = async () => {
+    if (isConnected) {
+      try {
+        const response = await axios.post("/api/start-pickup");
+        if (response.data.message === "started pickup") {
+          updateLog("Pickup sequence: Started");
+          setPickupDone(false);
+          inProgCount = 0;
+          // start interval to check arm pickup status every 3 seconds
+          armPickupInterval = setInterval(checkPickupStatus, 3000);
+        }
+      } catch (error) {
+        console.error("Error starting arm pickup sequence:", error);
+      }
+    } else {
+      alert("Rover already disconnected.");
+    }
+  };
+
+  const checkPickupStatus = async () => {
+    try {
+      const response = await axios.get("/api/pickup-status");
+      if (response.data.message === "True") {
+        updateLog("Pickup sequence: Completed");
+        setPickupDone(true);
+        inProgCount = 0;
+        // stop further interval checks if the sequence is completed
+        clearInterval(armPickupInterval);
+      } else {
+        // arm pickup sequence is still in progress
+        inProgCount += 1;
+        updateLog(`Pickup sequence: In Progress [${inProgCount}]`);
+      }
+    } catch (error) {
+      console.error("Error checking arm pickup status:", error);
+    }
+  };
+
   return (
     <Box
       style={{
@@ -104,9 +145,31 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
         padding: "10px",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
-        User Input
-      </Typography>
+      <Grid container item xs={12}>
+        <Grid item xs={6}>
+          <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+            User Input
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            {isConnected && (
+              <Button
+                variant="contained"
+                onClick={sendStartArm}
+                style={{
+                  height: "30px",
+                  backgroundColor: pickupDone ? "#FD7F20" : "grey",
+                  color: "white",
+                }}
+                disabled={!pickupDone}
+              >
+                Begin Pickup Sequence
+              </Button>
+            )}
+          </div>
+        </Grid>
+      </Grid>
 
       <Typography sx={{ mb: 1, font: "10px" }}>Set Motor Speed</Typography>
       <Grid container spacing={1} alignItems={"center"} marginBottom={"10px"}>

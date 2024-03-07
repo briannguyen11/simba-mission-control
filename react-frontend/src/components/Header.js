@@ -28,8 +28,10 @@ const outlinedInputStyle = {
 
 export default function Header({ updateLog, isConnected, setIsConnected }) {
   const [connectionData, setConnectionData] = useState({
-    ip: "",
-    port: "",
+    // ip: "",
+    // port: "",
+    ip: "129.65.138.247",
+    port: "6500",
   });
 
   // validates input is number
@@ -44,7 +46,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
   // connect to tover
   const sendConnectRequest = async () => {
     const { port } = connectionData;
-    if (isConnected === false) {
+    if (!isConnected) {
       if (isNumber(port)) {
         try {
           const response = await axios.post("/api/connect", connectionData);
@@ -66,7 +68,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
 
   // disconnect from rover
   const sendDisconnectRequest = async () => {
-    if (isConnected === true) {
+    if (isConnected) {
       try {
         const response = await axios.post("/api/disconnect");
         if (response.data.message === "Successfully disconnected") {

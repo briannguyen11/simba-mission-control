@@ -33,6 +33,50 @@ export default function ArrowKeys({ updateLog, isConnected }) {
   }, []);
 
   // Hanlde pressing keys down
+  // useEffect(() => {
+  //   const handleKeyDown = async (event) => {
+  //     let direction = null;
+
+  //     switch (event.key) {
+  //       case "ArrowUp":
+  //       case "ArrowDown":
+  //       case "ArrowLeft":
+  //       case "ArrowRight":
+  //         direction = event.key;
+  //         break;
+  //       default:
+  //         break;
+  //     }
+
+  //     setHighlightedKey(direction);
+
+  //     if (direction !== null) {
+  //       if (isConnected) {
+  //         try {
+  //           const response = await axios.post("/api/arrow-keys", {
+  //             direction,
+  //           });
+  //           updateLog(response.data.message);
+  //         } catch (error) {
+  //           console.error("Error making request:", error);
+  //         }
+  //       } else {
+  //         alert("Rover not connected.");
+  //       }
+  //     }
+  //   };
+  //   const handleKeyUp = () => {
+  //     setHighlightedKey(null);
+  //   };
+
+  //   window.addEventListener("keydown", handleKeyDown);
+  //   window.addEventListener("keyup", handleKeyUp);
+
+  //   return () => {
+  //     window.removeEventListener("keydown", handleKeyDown);
+  //     window.removeEventListener("keyup", handleKeyUp);
+  //   };
+  // }, [updateLog, isConnected]);
   useEffect(() => {
     const handleKeyDown = async (event) => {
       let direction = null;
@@ -43,6 +87,9 @@ export default function ArrowKeys({ updateLog, isConnected }) {
         case "ArrowLeft":
         case "ArrowRight":
           direction = event.key;
+          break;
+        case " ":
+          direction = "Stop";
           break;
         default:
           break;
@@ -65,6 +112,7 @@ export default function ArrowKeys({ updateLog, isConnected }) {
         }
       }
     };
+
     const handleKeyUp = () => {
       setHighlightedKey(null);
     };
