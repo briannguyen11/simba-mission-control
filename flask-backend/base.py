@@ -170,6 +170,7 @@ def start_pcikup():
     else:
         return jsonify({"error": "Failed to start pickup sequence"}), 400
 
+
 # @route   GET api/pickup-status
 # @desc    Checks connection status to rover
 # @access  Public

@@ -1,6 +1,6 @@
 // UserInput.js
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { Typography, Button, TextField, Grid, Box } from "@mui/material";
 
@@ -34,6 +34,8 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
   const [motorSpeed, setMotorSpeed] = useState("");
   const [motorDist, setMotorDist] = useState("");
   const [pickupDone, setPickupDone] = useState(true);
+  const [inProgCount, setInProgCount] = useState(0);
+  const armPickupInterval = useRef(null);
 
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
@@ -95,8 +97,27 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     }
   };
 
-  let inProgCount;
-  let armPickupInterval;
+  // let inProgCount;
+  // let armPickupInterval;
+  // const sendStartArm = async () => {
+  //   if (isConnected) {
+  //     try {
+  //       const response = await axios.post("/api/start-pickup");
+  //       if (response.data.message === "Started pickup") {
+  //         updateLog("Pickup sequence: Started");
+  //         setPickupDone(false);
+  //         inProgCount = 0;
+  //         // start interval to check arm pickup status every 3 seconds
+  //         armPickupInterval = setInterval(checkPickupStatus, 3000);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error starting arm pickup sequence:", error);
+  //     }
+  //   } else {
+  //     alert("Rover already disconnected.");
+  //   }
+  // };
+
   const sendStartArm = async () => {
     if (isConnected) {
       try {
@@ -104,9 +125,9 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
         if (response.data.message === "Started pickup") {
           updateLog("Pickup sequence: Started");
           setPickupDone(false);
-          inProgCount = 0;
-          // start interval to check arm pickup status every 3 seconds
-          armPickupInterval = setInterval(checkPickupStatus, 3000);
+          setInProgCount(0);
+          // Start interval to check arm pickup status every 3 seconds
+          armPickupInterval.current = setInterval(checkPickupStatus, 3000);
         }
       } catch (error) {
         console.error("Error starting arm pickup sequence:", error);
@@ -122,13 +143,17 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
       if (response.data.message === "True") {
         updateLog("Pickup sequence: Completed");
         setPickupDone(true);
-        inProgCount = 0;
+        setInProgCount(0);
         // stop further interval checks if the sequence is completed
-        clearInterval(armPickupInterval);
+        clearInterval(armPickupInterval.current);
       } else {
         // arm pickup sequence is still in progress
-        inProgCount += 1;
-        updateLog(`Pickup sequence: In Progress [${inProgCount}]`);
+        console.log(inProgCount); // debug ... just printing 0
+        setInProgCount((prevCount) => {
+          const newCount = prevCount + 1;
+          updateLog(`Pickup sequence: In Progress [${newCount}]`);
+          return newCount; // Return the updated value
+        });
       }
     } catch (error) {
       console.error("Error checking arm pickup status:", error);
