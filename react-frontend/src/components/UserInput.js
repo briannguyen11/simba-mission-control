@@ -1,6 +1,6 @@
 // UserInput.js
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import { Typography, Button, TextField, Grid, Box } from "@mui/material";
 
@@ -97,47 +97,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     }
   };
 
-  // let inProgCount;
-  // let armPickupInterval;
-  // const sendStartArm = async () => {
-  //   if (isConnected) {
-  //     try {
-  //       const response = await axios.post("/api/start-pickup");
-  //       if (response.data.message === "Started pickup") {
-  //         updateLog("Pickup sequence: Started");
-  //         setPickupDone(false);
-  //         inProgCount = 0;
-  //         // start interval to check arm pickup status every 3 seconds
-  //         armPickupInterval = setInterval(checkPickupStatus, 3000);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error starting arm pickup sequence:", error);
-  //     }
-  //   } else {
-  //     alert("Rover already disconnected.");
-  //   }
-  // };
-
-  const sendStartArm = async () => {
-    if (isConnected) {
-      try {
-        const response = await axios.post("/api/start-pickup");
-        if (response.data.message === "Started pickup") {
-          updateLog("Pickup sequence: Started");
-          setPickupDone(false);
-          setInProgCount(0);
-          // Start interval to check arm pickup status every 3 seconds
-          armPickupInterval.current = setInterval(checkPickupStatus, 3000);
-        }
-      } catch (error) {
-        console.error("Error starting arm pickup sequence:", error);
-      }
-    } else {
-      alert("Rover already disconnected.");
-    }
-  };
-
-  const checkPickupStatus = async () => {
+  const checkPickupStatus = useCallback(async () => {
     try {
       const response = await axios.get("/api/pickup-status");
       if (response.data.message === "True") {
@@ -158,7 +118,50 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     } catch (error) {
       console.error("Error checking arm pickup status:", error);
     }
-  };
+  }, [
+    updateLog,
+    setPickupDone,
+    setInProgCount,
+    armPickupInterval,
+    inProgCount,
+  ]);
+
+  const sendStartArm = useCallback(async () => {
+    if (isConnected) {
+      try {
+        const response = await axios.post("/api/start-pickup");
+        if (response.data.message === "Started pickup") {
+          updateLog("Pickup sequence: Started");
+          setPickupDone(false);
+          setInProgCount(0);
+          // Start interval to check arm pickup status every 3 seconds
+          armPickupInterval.current = setInterval(checkPickupStatus, 3000);
+        }
+      } catch (error) {
+        console.error("Error starting arm pickup sequence:", error);
+      }
+    } else {
+      alert("Rover already disconnected.");
+    }
+  }, [
+    isConnected,
+    updateLog,
+    setPickupDone,
+    setInProgCount,
+    checkPickupStatus,
+  ]);
+
+  useEffect(() => {
+    const handleKeyDown = async (event) => {
+      if (event.key === "r" && isConnected) {
+        sendStartArm();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isConnected, sendStartArm]);
 
   return (
     <Box
