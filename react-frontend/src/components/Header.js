@@ -30,7 +30,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
   const [connectionData, setConnectionData] = useState({
     // ip: "",
     // port: "",
-    ip: "129.65.138.247",
+    ip: "192.168.1.1",
     port: "6500",
   });
 
