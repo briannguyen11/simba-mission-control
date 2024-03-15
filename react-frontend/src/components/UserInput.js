@@ -217,15 +217,26 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
       });
       return gamepad.buttons;
     };
+    let animationFrameId = null;
 
     const gameLoop = () => {
       let buttons = checkGamepadInput();
       prevButtonStates.current = buttons.map((b) => b.pressed);
-      requestAnimationFrame(gameLoop);
+      animationFrameId = requestAnimationFrame(gameLoop);
     };
 
-    const animationFrameId = requestAnimationFrame(gameLoop);
-    return () => cancelAnimationFrame(animationFrameId);
+    const handleKeyDown = async (event) => {
+      if (event.key === "Enter" && isConnected) {
+        sendStartArm();
+      }
+    };
+    animationFrameId = requestAnimationFrame(gameLoop);
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      animationFrameId && cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [isConnected, updateLog, sendStartArm]);
 
   return (
