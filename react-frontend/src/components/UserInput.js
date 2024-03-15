@@ -35,8 +35,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
   const [motorDist, setMotorDist] = useState("");
   const [pickupDone, setPickupDone] = useState(true);
   const [inProgCount, setInProgCount] = useState(0);
-  const [gamepad, setGamepad] = useState(null);
-  const [prevButtonStates, setPrevButtonStates] = useState([]);
+  const prevButtonStates = useRef([]);
   const armPickupInterval = useRef(null);
 
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
@@ -159,21 +158,17 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
       } catch (error) {
         console.error("Error starting arm pickup sequence:", error);
       }
-    } else {
-      alert("Rover already disconnected.");
     }
   }, [checkPickupStatus, isConnected, updateLog]);
 
   useEffect(() => {
     const handleGamepadConnection = (event) => {
       const gamepad = event.gamepad;
-      setGamepad(gamepad);
       console.log("Gamepad connected:", gamepad);
     };
 
     // Function to handle gamepad disconnection
     const handleGamepadDisconnection = (event) => {
-      setGamepad(null);
       console.log("Gamepad disconnected:", event.gamepad);
     };
     window.addEventListener("gamepadconnected", handleGamepadConnection);
@@ -190,8 +185,9 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
 
   useEffect(() => {
     // Function to check gamepad input
-    const checkGamepadInput = async () => {
-      if (!gamepad) return;
+    const checkGamepadInput = () => {
+      let gamepad = navigator.getGamepads()[0];
+      if (!gamepad) return [];
 
       // Check D-PAD button presses
       const dPadButtons = {
@@ -211,8 +207,8 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
 
       // Iterate through buttons and check their states
       gamepad.buttons.forEach((button, index) => {
-        const prevButtonState = prevButtonStates[index];
-        if (button.pressed && !prevButtonState) {
+        const prevButtonState = prevButtonStates.current[index];
+        if (button.pressed && prevButtonState === false) {
           // Check D-PAD buttons
           if (dPadButtons[index] || actionButtons[index] === "A") {
             const direction =
@@ -229,30 +225,32 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
                   alert("Rover not connected.");
                 });
             }
-            console.log("D-PAD Button Pressed:", direction);
-          }
-
-          // Check action buttons
-          if (actionButtons[index] === "Y") {
+            console.log("D-PAD Button Pressed:", direction, prevButtonState);
+          } else if (actionButtons[index] === "Y") {
             // do arm stuff
             sendStartArm();
             console.log("Action Button Pressed:", actionButtons[index]);
+          } else {
+            console.log(index, button);
           }
         }
       });
+      return gamepad.buttons;
     };
 
     const gameLoop = () => {
-      checkGamepadInput();
-      setPrevButtonStates(
-        gamepad ? gamepad.buttons.map((button) => button.pressed) : []
-      );
+      let buttons = checkGamepadInput();
+      buttons.length === 0 && console.log("bad");
+      prevButtonStates.current = buttons.map((b) => b.pressed);
       requestAnimationFrame(gameLoop);
     };
 
+    // const intervalId = setInterval(gameLoop, 100);
+    // return () => clearInterval(intervalId);
+
     const animationFrameId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [gamepad, prevButtonStates, isConnected, updateLog, sendStartArm]);
+  }, [prevButtonStates, isConnected, updateLog, sendStartArm]);
 
   return (
     <Box
