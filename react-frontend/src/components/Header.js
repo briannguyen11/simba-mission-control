@@ -1,6 +1,6 @@
 // Header.js
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import axios from "axios";
 
 import { Button, Typography, TextField, Grid, Box } from "@mui/material";
@@ -33,6 +33,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
     ip: "192.168.1.1",
     port: "6500",
   });
+  const intervalId = useRef();
 
   // validates input is number
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
@@ -43,6 +44,24 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
     setConnectionData({ ...connectionData, [name]: value });
   }
 
+  const checkConnectionStatus = async () => {
+    try {
+      // we don't want this to be called if we are not connected, this check if we are connected
+      const response = await axios.get("/api/connection-status");
+      const status = response.data.connection;
+      if (status === true) {
+        updateLog("Connected");
+      } else {
+        updateLog("Disconnected");
+        alert("Disconnected from rover.");
+        setIsConnected(false);
+        intervalId.current && clearInterval(intervalId.current);
+      }
+    } catch (error) {
+      console.error("Error checking connection status:", error);
+    }
+  };
+
   // connect to tover
   const sendConnectRequest = async () => {
     const { port } = connectionData;
@@ -52,6 +71,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
           const response = await axios.post("/api/connect", connectionData);
           if (response && response.status === 200) {
             setIsConnected(true);
+            intervalId.current = setInterval(checkConnectionStatus, 5000);
             updateLog(response.data.message);
           } else {
             alert("Failed to connect to rover with given input.");
@@ -73,6 +93,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
         const response = await axios.post("/api/disconnect");
         if (response.data.message === "Successfully disconnected") {
           setIsConnected(false);
+          intervalId.current && clearInterval(intervalId.current);
           updateLog(response.data.message);
           setConnectionData({ ip: "", port: "" });
         }

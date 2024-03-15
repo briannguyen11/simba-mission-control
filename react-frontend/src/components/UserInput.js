@@ -98,27 +98,6 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     }
   };
 
-  // let inProgCount;
-  // let armPickupInterval;
-  // const sendStartArm = async () => {
-  //   if (isConnected) {
-  //     try {
-  //       const response = await axios.post("/api/start-pickup");
-  //       if (response.data.message === "Started pickup") {
-  //         updateLog("Pickup sequence: Started");
-  //         setPickupDone(false);
-  //         inProgCount = 0;
-  //         // start interval to check arm pickup status every 3 seconds
-  //         armPickupInterval = setInterval(checkPickupStatus, 3000);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error starting arm pickup sequence:", error);
-  //     }
-  //   } else {
-  //     alert("Rover already disconnected.");
-  //   }
-  // };
-
   const checkPickupStatus = useCallback(async () => {
     try {
       const response = await axios.get("/api/pickup-status");
@@ -142,8 +121,6 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     }
   }, [updateLog]);
 
-  // it's ok i will keep this code separate  not sure if it will work
-  // thanks
   const sendStartArm = useCallback(async () => {
     if (isConnected) {
       try {
@@ -208,7 +185,10 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
       // Iterate through buttons and check their states
       gamepad.buttons.forEach((button, index) => {
         const prevButtonState = prevButtonStates.current[index];
-        if (button.pressed && prevButtonState === false) {
+        // if (button.pressed) {
+        //   console.log(index, button);
+        // }
+        if (button.pressed && !prevButtonState) {
           // Check D-PAD buttons
           if (dPadButtons[index] || actionButtons[index] === "A") {
             const direction =
@@ -240,17 +220,13 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
 
     const gameLoop = () => {
       let buttons = checkGamepadInput();
-      buttons.length === 0 && console.log("bad");
       prevButtonStates.current = buttons.map((b) => b.pressed);
       requestAnimationFrame(gameLoop);
     };
 
-    // const intervalId = setInterval(gameLoop, 100);
-    // return () => clearInterval(intervalId);
-
     const animationFrameId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [prevButtonStates, isConnected, updateLog, sendStartArm]);
+  }, [isConnected, updateLog, sendStartArm]);
 
   return (
     <Box
@@ -281,7 +257,9 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
                 }}
                 disabled={!pickupDone}
               >
-                Begin Pickup Sequence
+                {pickupDone
+                  ? "Begin Pickup Sequence"
+                  : `Arm running ${inProgCount * 3}s`}
               </Button>
             )}
           </div>
