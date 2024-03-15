@@ -34,7 +34,7 @@ export default function Header({ updateLog, isConnected, setIsConnected }) {
     port: "6500",
   });
 
-  // validates input is number
+  // validates input is number 
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
 
   // update text field data

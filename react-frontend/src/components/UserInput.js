@@ -153,7 +153,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
 
   useEffect(() => {
     const handleKeyDown = async (event) => {
-      if (event.key === "r" && isConnected) {
+      if (event.key === "Enter" && isConnected) {
         sendStartArm();
       }
     };
