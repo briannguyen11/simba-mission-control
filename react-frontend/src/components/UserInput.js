@@ -1,6 +1,6 @@
 // UserInput.js
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Typography, Button, TextField, Grid, Box } from "@mui/material";
 
@@ -35,6 +35,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
   const [motorDist, setMotorDist] = useState("");
   const [pickupDone, setPickupDone] = useState(true);
   const [inProgCount, setInProgCount] = useState(0);
+  const prevButtonStates = useRef([]);
   const armPickupInterval = useRef(null);
 
   const isNumber = (value) => !isNaN(parseFloat(value)) && isFinite(value);
@@ -108,8 +109,8 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
         clearInterval(armPickupInterval.current);
       } else {
         // arm pickup sequence is still in progress
-        console.log(inProgCount); // debug ... just printing 0
         setInProgCount((prevCount) => {
+          console.log(prevCount); // debug ... just printing 0
           const newCount = prevCount + 1;
           updateLog(`Pickup sequence: In Progress [${newCount}]`);
           return newCount; // Return the updated value
@@ -118,13 +119,7 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
     } catch (error) {
       console.error("Error checking arm pickup status:", error);
     }
-  }, [
-    updateLog,
-    setPickupDone,
-    setInProgCount,
-    armPickupInterval,
-    inProgCount,
-  ]);
+  }, [updateLog]);
 
   const sendStartArm = useCallback(async () => {
     if (isConnected) {
@@ -140,28 +135,109 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
       } catch (error) {
         console.error("Error starting arm pickup sequence:", error);
       }
-    } else {
-      alert("Rover already disconnected.");
     }
-  }, [
-    isConnected,
-    updateLog,
-    setPickupDone,
-    setInProgCount,
-    checkPickupStatus,
-  ]);
+  }, [checkPickupStatus, isConnected, updateLog]);
 
   useEffect(() => {
+    const handleGamepadConnection = (event) => {
+      const gamepad = event.gamepad;
+      console.log("Gamepad connected:", gamepad);
+    };
+
+    // Function to handle gamepad disconnection
+    const handleGamepadDisconnection = (event) => {
+      console.log("Gamepad disconnected:", event.gamepad);
+    };
+    window.addEventListener("gamepadconnected", handleGamepadConnection);
+    window.addEventListener("gamepaddisconnected", handleGamepadDisconnection);
+
+    return () => {
+      window.removeEventListener("gamepadconnected", handleGamepadConnection);
+      window.removeEventListener(
+        "gamepaddisconnected",
+        handleGamepadDisconnection
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    // Function to check gamepad input
+    const checkGamepadInput = () => {
+      let gamepad = navigator.getGamepads()[0];
+      if (!gamepad) return [];
+
+      // Check D-PAD button presses
+      const dPadButtons = {
+        12: "ArrowUp",
+        13: "ArrowDown",
+        14: "ArrowLeft",
+        15: "ArrowRight",
+      };
+
+      // Check A, X, B, Y button presses
+      const actionButtons = {
+        0: "A",
+        2: "X",
+        1: "B",
+        3: "Y",
+      };
+
+      // Iterate through buttons and check their states
+      gamepad.buttons.forEach((button, index) => {
+        const prevButtonState = prevButtonStates.current[index];
+        // if (button.pressed) {
+        //   console.log(index, button);
+        // }
+        if (button.pressed && !prevButtonState) {
+          // Check D-PAD buttons
+          if (dPadButtons[index] || actionButtons[index] === "A") {
+            const direction =
+              actionButtons[index] === "A" ? "Stop" : dPadButtons[index];
+            if (isConnected) {
+              axios
+                .post("/api/arrow-keys", {
+                  direction: direction,
+                })
+                .then((response) => {
+                  updateLog(response.data.message);
+                })
+                .catch(() => {
+                  alert("Rover not connected.");
+                });
+            }
+            console.log("D-PAD Button Pressed:", direction, prevButtonState);
+          } else if (actionButtons[index] === "Y") {
+            // do arm stuff
+            sendStartArm();
+            console.log("Action Button Pressed:", actionButtons[index]);
+          } else {
+            console.log(index, button);
+          }
+        }
+      });
+      return gamepad.buttons;
+    };
+    let animationFrameId = null;
+
+    const gameLoop = () => {
+      let buttons = checkGamepadInput();
+      prevButtonStates.current = buttons.map((b) => b.pressed);
+      animationFrameId = requestAnimationFrame(gameLoop);
+    };
+
     const handleKeyDown = async (event) => {
       if (event.key === "Enter" && isConnected) {
         sendStartArm();
       }
     };
+    animationFrameId = requestAnimationFrame(gameLoop);
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
+      animationFrameId && cancelAnimationFrame(animationFrameId);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isConnected, sendStartArm]);
+  }, [isConnected, updateLog, sendStartArm]);
 
   return (
     <Box
@@ -192,7 +268,9 @@ export default function UserInput({ updateLog, setRouteData, isConnected }) {
                 }}
                 disabled={!pickupDone}
               >
-                Begin Pickup Sequence
+                {pickupDone
+                  ? "Begin Pickup Sequence"
+                  : `Arm running ${inProgCount * 3}s`}
               </Button>
             )}
           </div>
